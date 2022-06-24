@@ -19,7 +19,7 @@ class   Token
         
         
         string  _type;
-        Number    _value;
+        Number	_value;
 
     public:
         Token(): _type(string()), _value(char())
@@ -55,8 +55,8 @@ class   Token
             return str();
         }
 
-        string  getType()   const { return (_type); };
-        Number    getValue()  const { return (_value); };
+        string	getType()   const { return (_type); };
+        Number	getValue()  const { return (_value); };
 
         void    setType(const string type) { _type = type; };
         void    setValue(const Number value) { _value = value; };
@@ -102,7 +102,7 @@ class   Interpreter
 
 		Number	integer()
 		{
-			Number result;
+			string result;
 
 			while (_current_char != 0 && isdigit(_current_char))
 			{
@@ -150,29 +150,37 @@ class   Interpreter
                 this->error();
         }
 
+		Number	term()
+		{
+			Token token = _current_token;
+			this->eat(INTEGER);
+			return (token.getValue());
+		}
+
         Number     expr()
         {
 		    _current_token = this->get_next_token();
 
-            Token left = _current_token;
-            this->eat(INTEGER);
+			Number result = this->term();
+			while (	_current_token.getType() == PLUS
+			|| 		_current_token.getType() == MINUS)
+			{
+				Token token = _current_token;
+				if (token.getType() == PLUS)
+				{
+					this->eat(PLUS);
+					result += this->term();
+				}
+				else if (token.getType() == MINUS)
+				{
+					this->eat(MINUS);
+					result -= this->term();
+				}
+			}
 
-            Token op = _current_token;
-            if (op.getType() == PLUS)
-				this->eat(PLUS);
-			else
-				this->eat(MINUS);
-			
-            Token right = _current_token;
-            this->eat(INTEGER);
+			return (result);
 
-            Number result;
-			if (op.getType() == PLUS)
-				result = left.getValue() + right.getValue();
-			else
-				result = left.getValue() - right.getValue();
 
-            return (result);
         }
 
 

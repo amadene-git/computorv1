@@ -10,6 +10,8 @@ using namespace std;
 #define INTEGER "INTEGER"
 #define PLUS    "PLUS"
 #define MINUS	"MINUS"
+#define MUL    	"MUL"
+#define DIV		"DIV"
 #define EOL     "EOL"
 #define ERR     "ERR"
 
@@ -19,7 +21,7 @@ class   Token
         
         
         string  _type;
-        Number    _value;
+        Number	_value;
 
     public:
         Token(): _type(string()), _value(char())
@@ -55,35 +57,45 @@ class   Token
             return str();
         }
 
-        string  getType()   const { return (_type); };
-        Number    getValue()  const { return (_value); };
+        string	getType()   const { return (_type); };
+        Number	getValue()  const { return (_value); };
 
         void    setType(const string type) { _type = type; };
         void    setValue(const Number value) { _value = value; };
 
 };
 
-class   Interpreter
+class Lexer
 {
-    private:
-        Interpreter()
-        {};
-
-        string  _text;
-        int     _pos;
-        Token   _current_token;
+	private:
+		string	_text;
+		int		_pos;
 		char	_current_char;
 
     public:
 
-        Interpreter(string text) : _text(text), _pos(0), _current_char(_text[_pos])
+		Lexer(Lexer const &src) { *this = src; };
+		Lexer	&operator=(Lexer const &rhs)
+		{
+			this->_current_char = rhs._current_char;
+			this->_pos = rhs._pos;
+			this->_text = rhs._text;
+			return (*this);
+		};
+
+        Lexer(string text) : _text(text), _pos(0), _current_char(_text[_pos])
         {};
 
-        void    error()
-        {
-            throw runtime_error("Error parsing input");
-        };
+		string  getText()           const   { return (_text); };
+        int     getPos()            const   { return (_pos); };
+        void    setText(string text)                    { _text = text; };
+        void    setPos(int pos)                         { _pos = pos; };
 
+
+		void    error()
+        {
+            throw runtime_error("Error Lexer: Invalid character");
+        };
 
 		void	advance()
 		{
@@ -102,7 +114,7 @@ class   Interpreter
 
 		Number	integer()
 		{
-			Number result;
+			string result;
 
 			while (_current_char != 0 && isdigit(_current_char))
 			{
@@ -125,15 +137,15 @@ class   Interpreter
 				{
 					return (Token(INTEGER, this->integer()));
 				}
-				if (_current_char == '+')
+				if (_current_char == '*')
 				{
 					this->advance();
-					return (Token(PLUS, 0));
+					return (Token(MUL, 0));
 				}
-				if (_current_char == '-')
+				if (_current_char == '/')
 				{
 					this->advance();
-					return (Token(MINUS, 0));
+					return (Token(DIV, 0));
 				}
 				
 				this->error();
@@ -142,46 +154,67 @@ class   Interpreter
 			return (Token(EOL, 0));
         };
 
+
+};
+
+class   Interpreter
+{
+    private:
+
+		Lexer	_lexer;
+		Token	_current_token;
+    
+	public:
+
+        Interpreter(Lexer lexer) : _lexer(lexer), _current_token(_lexer.get_next_token())
+        {};
+
+       void	error()
+	   {
+			throw runtime_error("Error Interpreter: Invalid syntax");
+	   }
+
+
         void    eat(string token_type)
         {
             if (_current_token.getType() == token_type)
-                _current_token = this->get_next_token();
+                _current_token = _lexer.get_next_token();
             else
                 this->error();
         }
 
+		Number	factor()
+		{
+			Token	token = _current_token;
+
+			this->eat(INTEGER);
+			return (token.getValue());
+		}
+
         Number     expr()
         {
-		    _current_token = this->get_next_token();
+			Number result = this->factor();
 
-            Token left = _current_token;
-            this->eat(INTEGER);
-
-            Token op = _current_token;
-            if (op.getType() == PLUS)
-				this->eat(PLUS);
-			else
-				this->eat(MINUS);
-			
-            Token right = _current_token;
-            this->eat(INTEGER);
-
-            Number result;
-			if (op.getType() == PLUS)
-				result = left.getValue() + right.getValue();
-			else
-				result = left.getValue() - right.getValue();
-
-            return (result);
+			while (	_current_token.getType() == MUL
+			||		_current_token.getType() == DIV)
+			{
+				if (_current_token.getType() == MUL)
+				{
+					this->eat(MUL);
+					result *= this->factor();
+				}
+				else if (_current_token.getType() == DIV)
+				{
+					this->eat(DIV);
+					result /= this->factor();
+				}
+			}
+			return (result);
         }
 
 
-        string  getText()           const   { return (_text); };
-        int     getPos()            const   { return (_pos); };
         Token   getCurrent_token()  const   { return (_current_token); };
 
-        void    setText(string text)                    { _text = text; };
-        void    setPos(int pos)                         { _pos = pos; };
         void    setCurrent_token(Token current_token)   { _current_token = current_token; }; 
 };
 
@@ -201,8 +234,9 @@ int main()
             if (!input.length())
                 continue;
 
-            Interpreter interpreter(input);
-            Number result = interpreter.expr();
+			Lexer		lexer(input);
+            Interpreter interpreter(lexer);
+            Number 		result = interpreter.expr();
             cout << result << endl;  
         }
         catch(const std::exception& e)
