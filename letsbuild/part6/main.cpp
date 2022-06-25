@@ -274,42 +274,42 @@ class   Interpreter
 
 int main()
 {
-    string input;
-    while (1)
-    {
-        try
-        {
-            cout << "calc> ";
-            if (getline(cin, input, '\n').eof())
-			{
-				return 0;
-			}
-            if (!input.length())
-                continue;
+    // string input;
+    // while (1)
+    // {
+    //     try
+    //     {
+    //         cout << "calc> ";
+    //         if (getline(cin, input, '\n').eof())
+	// 		{
+	// 			return 0;
+	// 		}
+    //         if (!input.length())
+    //             continue;
 
-			Lexer		lexer(input);
-            Interpreter interpreter(lexer);
-            Number 		result = interpreter.expr();
-            if (interpreter.getCurrent_token().getType() != EOL)
-				interpreter.error();
+	// 		Lexer		lexer(input);
+    //         Interpreter interpreter(lexer);
+    //         Number 		result = interpreter.expr();
+    //         if (interpreter.getCurrent_token().getType() != EOL)
+	// 			interpreter.error();
 			
-			cout << result << endl;  
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
-        }
+	// 		cout << result << endl;  
+    //     }
+    //     catch(const std::exception& e)
+    //     {
+    //         std::cerr << e.what() << '\n';
+    //     }
         
-    }
+    // }
 
-	// Number nbr1(0, 9223372036854775807);
-	// Number nbr2(0, 922337203685477580);
-	// cout << "nbr1: " << nbr1 << endl;
-	// cout << "nbr2: " << nbr2 << endl;
+	Number nbr1(-45, 78);
+	Number nbr2(-12, 89);
+	cout << "nbr1: " << nbr1 << endl;
+	cout << "nbr2: " << nbr2 << endl;
 
 
 
-	// nbr1 += nbr2;
-	// cout << nbr1 << endl;
+	nbr1 += nbr2;
+	cout << nbr1 << endl;
 
 }

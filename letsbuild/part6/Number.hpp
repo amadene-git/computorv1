@@ -157,11 +157,9 @@ public:
 			long int lhs_dec1;
 			long int lhs_dec2;
 
-
 			rhs_dec1 = rhs.decimal;
 			lhs_dec1 = this->decimal;
 
-			
 			while (to_str(lhs_dec1).length() < 18)
 				lhs_dec1 *= 10;
 			while (to_str(rhs_dec1).length() < 18)
@@ -178,15 +176,27 @@ public:
 
 			lhs_dec2 -= lhs_dec1 * 1000000000;// 10 ^ 9 
 			rhs_dec2 -= rhs_dec1 * 1000000000;// 10 ^ 9
-						
-			lhs_dec2 += rhs_dec2;
+
 
 			int ret = 0;
-			
-			if (to_str(lhs_dec2).length() > 9)
-				ret = to_str(lhs_dec2)[0] - '0';
-			lhs_dec2 %= 1000000000;// 10 ^ 9
 
+			if (to_str(lhs_dec1).length() > to_str(rhs_dec1).length())
+			{
+				rhs_dec1 *= 10;
+				rhs_dec1 += to_str(rhs_dec2)[0] - '0';
+				rhs_dec2 -= (to_str(rhs_dec2)[0] - '0') * 100000000;
+				rhs_dec2 *= 10;
+
+				lhs_dec2 += rhs_dec2;
+			}
+			else
+			{
+				lhs_dec2 += rhs_dec2;
+
+				if (to_str(lhs_dec2).length() > 9)
+					ret = to_str(lhs_dec2)[0] - '0';
+				lhs_dec2 %= 1000000000;// 10 ^ 9
+			}
 			if (to_str(lhs_dec1).length() == 9 
 			&&	to_str(rhs_dec1).length() == 9)
 			{
@@ -195,7 +205,7 @@ public:
 				if (to_str(lhs_dec1).length() > 9)
 					ret = to_str(lhs_dec1)[0] - '0';
 				lhs_dec1 %= 1000000000;// 10 ^ 9
-				this->decimal = lhs_dec1 * 1000000000 + lhs_dec2;
+				this->decimal = lhs_dec1 * 1000000000 + lhs_dec2;//10 ^ 9
 				if (this->integer > 0 && this->integer + ret < 0)
 					throw overflow_error("Error: Overflow Number in operator+ overload");
 				this->integer += ret;
@@ -216,10 +226,6 @@ public:
 			}
 
 
-			// cout << "lhs_dec1: "<< lhs_dec1 << endl;
-			// cout << "lhs_dec2: "<< lhs_dec2 << endl;
-			// cout << "rhs_dec1: "<< rhs_dec1 << endl;
-			// cout << "rhs_dec2: "<< rhs_dec2 << endl;
 
 			while (to_str(this->decimal).back() == '0' && this->decimal != 0)
 				this->decimal /= 10;
@@ -237,6 +243,21 @@ public:
 		|| this->integer < 0 && rhs.getInteger() > 0 && this->integer + rhs.getInteger() > 0)
 			throw overflow_error("Error: Overflow Number in operator- overload");
 
+		if (this->integer < 0 && rhs.getInteger() > 0)
+		{
+			*this = *this + Number(rhs.getInteger() * -1, rhs.getDecimal());
+			return (*this);
+		}
+		if (this->integer > 0 && rhs.getInteger() < 0)
+		{
+			if (to_str(rhs.getInteger()) == "-9223372036854775808")
+				throw overflow_error("Error: Overflow Number in operator- overload");
+			
+			*this = *this + Number(rhs.getInteger() * -1, rhs.getDecimal());
+			return (*this);
+		}
+
+		
 		this->integer -= rhs.getInteger();
 		return (*this);
 	};
