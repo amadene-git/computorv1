@@ -1,0 +1,15 @@
+expr: 			term ((MINUS | PLUS) term)*
+
+term:			factor ((MUL | DIV) factor)*
+
+factor: 		INTGER | LPAREN expr RPAREN
+
+
+INTEGER: DIGIT | DIGIT (INTGER)*
+DIGIT: 0|1|2|3|4|5|6|7|8|9
+PLUS: +
+MINUS: -
+MUL: *
+DIV: /
+LPAREN: (
+RPAREN: )
