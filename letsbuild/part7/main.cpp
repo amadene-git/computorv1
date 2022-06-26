@@ -20,44 +20,34 @@ using namespace std;
 class   Token
 {
     private:
-        
         string  _type;
         Number	_value;
 
     public:
-        Token(): _type(string()), _value(char())
-        {};
+        Token(): _type(), _value() {};
         Token(string type, Number value) : _type(type), _value(value)
         {};
 
-        Token(Token const &src)
-        {
-            *this = src;
-        };
-
+        Token(Token const &src) { *this = src; };
         Token   &operator=(Token const &rhs)
         {
             this->_type = rhs.getType();
             this->_value = rhs.getValue();
             return (*this);
         }
+        string	getType()   const { return (_type); };
+        Number	getValue()  const { return (_value); };
+        void    setType(const string type) { _type = type; };
+        void    setValue(const Number value) { _value = value; };        
         
-        ~Token()
+		~Token()
         {};
         
         string  str()
         {
            	stringstream ss;
-		   	char op = (char)_value.getInteger(); 
 		   
-		   	ss << "Token(" << _type << ", '";
-			
-			if (_type == INTEGER)
-				ss << _value;
-			else
-				ss << op; 
-			
-			ss << "')";
+		   	ss << "Token(" << _type << ", '" << _value << "')";
 			return (ss.str());
         };
 
@@ -65,41 +55,37 @@ class   Token
         {
             return str();
         }
-
-        string	getType()   const { return (_type); };
-        Number	getValue()  const { return (_value); };
-
-        void    setType(const string type) { _type = type; };
-        void    setValue(const Number value) { _value = value; };
-
 };
 
 class Lexer
 {
 	private:
-		string	_text;
+		string	*_text;
 		int		_pos;
 		char	_current_char;
 
     public:
+		Lexer() : _text(NULL), _pos(0), _current_char(0) {};
+        Lexer(string &text) : _text(&text), _pos(0), _current_char(_text->at(_pos))
+        {};
 
 		Lexer(Lexer const &src) { *this = src; };
 		Lexer	&operator=(Lexer const &rhs)
 		{
-			this->_current_char = rhs._current_char;
-			this->_pos = rhs._pos;
-			this->_text = rhs._text;
+			this->_current_char = rhs.getCurrent_char();
+			this->_pos = rhs.getPos();
+			this->_text = &rhs.getText();
 			return (*this);
 		};
-
-        Lexer(string text) : _text(text), _pos(0), _current_char(_text[_pos])
-        {};
-
-		string  getText()           const   { return (_text); };
-        int     getPos()            const   { return (_pos); };
-        void    setText(string text)                    { _text = text; };
+		string  &getText()         	const   { return (*_text); };
+        int     getPos()          	const	{ return (_pos); };
+		char	getCurrent_char()	const	{ return (_current_char); }
+        void    setText(string &text)                   { _text = &text; };
         void    setPos(int pos)                         { _pos = pos; };
+        void    setCurrent_char(int pos)                { _pos = pos; };
 
+		~Lexer()
+		{};
 
 		void    error()
         {
@@ -109,10 +95,10 @@ class Lexer
 		void	advance()
 		{
 			++_pos;
-			if (_pos >= _text.length())
+			if ((long unsigned int)_pos >= _text->length())
 				_current_char = 0;
 			else
-				_current_char = _text[_pos];
+				_current_char = _text->at(_pos);
 		}
 
 		void	skip_whitespace()
@@ -150,41 +136,38 @@ class Lexer
 				if (_current_char == '+')
 				{
 					this->advance();
-					return (Token(PLUS, '+'));
+					return (Token(PLUS, 0));
 				}
 				if (_current_char == '-')
 				{
 					this->advance();
-					return (Token(MINUS, '-'));
+					return (Token(MINUS, 0));
 				}
 				if (_current_char == '*')
 				{
 					this->advance();
-					return (Token(MUL, '*'));
+					return (Token(MUL, 0));
 				}
 				if (_current_char == '/')
 				{
 					this->advance();
-					return (Token(DIV, '/'));
+					return (Token(DIV, 0));
 				}
 				if (_current_char == '(')
 				{
 					this->advance();
-					return (Token(LPAREN, '('));
+					return (Token(LPAREN, 0));
 				}
 				if (_current_char == ')')
 				{
 					this->advance();
-					return (Token(RPAREN, ')'));
+					return (Token(RPAREN, 0));
 				}
-						
-				
+
 				this->error();
 			}
 			return (Token(EOL, 0));
         };
-
-
 };
 
 class Node
@@ -262,25 +245,38 @@ void	clear_btree(Node *root)
 class   Parser
 {
     private:
-
-		Lexer	_lexer;
+		Lexer	*_lexer;
 		Token	_current_token;
-    
+
 	public:
-
-        Parser(Lexer lexer) : _lexer(lexer), _current_token(_lexer.get_next_token())
+		Parser() : _lexer(NULL), _current_token(){};
+        Parser(Lexer &lexer) : _lexer(&lexer), _current_token(_lexer->get_next_token())
         {};
+		
+		Parser(const Parser &src) { *this = src; };
+		Parser	&operator=(const Parser &rhs)
+		{
+			_lexer 			= &rhs.getLexer();
+			_current_token	= rhs.getCurrent_token();
+			return (*this);
+		};
+		Lexer	&getLexer()			const	{ return (*_lexer); };
+		Token   getCurrent_token()	const   { return (_current_token); };
+        void    setLexer(Lexer &lexer)					{ _lexer = &lexer; }; 
+        void    setCurrent_token(Token current_token)   { _current_token = current_token; }; 
 
-       void	error()
-	   {
+		~Parser()
+		{};
+
+		void	error()
+		{
 			throw runtime_error("Error Parser: Invalid syntax");
-	   }
-
+		}
 
         void    eat(string token_type)
         {
             if (_current_token.getType() == token_type)
-                _current_token = _lexer.get_next_token();
+                _current_token = _lexer->get_next_token();
             else
                 this->error();
         }
@@ -301,6 +297,7 @@ class   Parser
 				this->eat(RPAREN);
 				return (node);
 			}
+			return (NULL);
 		}
 
         Node	*term()
@@ -343,21 +340,76 @@ class   Parser
 				node = new Node(token, node, this->term());
 
 			}
-			return (node);
-			
+			return (node);		
 		}
-
 
 		Node	*parse()
 		{
 			return this->expr();
 		}
-
-        Token   getCurrent_token()  const   { return (_current_token); };
-
-        void    setCurrent_token(Token current_token)   { _current_token = current_token; }; 
 };
 
+
+class	Interpreter
+{
+	private:
+		Parser	*_parser;
+	
+	public:
+	Interpreter() : _parser(NULL) {};
+	Interpreter(Parser &parser) : _parser(&parser){};
+
+	Interpreter(Parser const &src) { *this = src; };
+	Interpreter	&operator=(Interpreter const &rhs)
+	{
+		this->_parser = &rhs.getParser();
+		return (*this);
+	};
+	Parser	&getParser()	const	{ return (*_parser); };
+	void	setParser(Parser &parser)	{ _parser = &parser; };
+
+	~Interpreter() 
+	{};
+
+ 	void	error()
+	{
+		throw runtime_error("Error Interpreter: Invalid syntax");
+	}
+
+	void	calcul(Node *node)
+	{
+		if (node->left)
+			calcul(node->left);
+
+		if (node->right)
+			calcul(node->right);
+		
+		
+		if (node->data.getType() == PLUS)	
+			node->data.setValue((node->left->data.getValue() + node->right->data.getValue()));
+        else if (node->data.getType() == MINUS)	
+			node->data.setValue((node->left->data.getValue() - node->right->data.getValue()));
+        else if (node->data.getType() == MUL)	
+			node->data.setValue((node->left->data.getValue() * node->right->data.getValue()));
+        else if (node->data.getType() == DIV)	
+			node->data.setValue((node->left->data.getValue() / node->right->data.getValue()));
+
+	};
+
+	Number	interpret()
+	{
+		Node	*ast = _parser->parse();
+		if (_parser->getCurrent_token().getType() != EOL)
+			_parser->error();
+
+		this->calcul(ast);
+
+		Number	result = ast->data.getValue();
+
+		clear_btree(ast);
+		return (result);
+	}
+};
 
 int main()
 {
@@ -378,13 +430,10 @@ int main()
 
 			Lexer		lexer(input);
             Parser 		parser(lexer);
-			Node 		*tree = parser.parse();
-            // if (interpreter.getCurrent_token().getType() != EOL)
-			// 	interpreter.error();
+			Interpreter	interpreter(parser);
+			Number		result = interpreter.interpret();
 			
-			print_btree(tree);
-			clear_btree(tree);
-			tree = NULL;
+			cout << result << endl; 
         }
         catch(const std::exception& e)
         {

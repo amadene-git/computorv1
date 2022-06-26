@@ -148,8 +148,9 @@ public:
 
 	Number	&operator+(Number const &rhs)
 	{
-		if (this->integer > 0 && rhs.getInteger() > 0 && this->integer + rhs.getInteger() < 0
-		|| this->integer < 0 && rhs.getInteger() < 0 && this->integer + rhs.getInteger() > 0)
+		// cout << this->getInteger() << " + " << rhs.getInteger() << endl;
+		if ((this->integer > 0 && rhs.getInteger() > 0 && this->integer + rhs.getInteger() < 0)
+		|| (this->integer < 0 && rhs.getInteger() < 0 && this->integer + rhs.getInteger() > 0))
 			throw overflow_error("Error: Overflow Number in operator+ overload");
 		
 		this->integer += rhs.getInteger();
@@ -243,8 +244,9 @@ public:
 	};
 	Number	&operator-(Number const &rhs)
 	{
-		if (this->integer > 0 && rhs.getInteger() < 0 && this->integer + rhs.getInteger() < 0
-		|| this->integer < 0 && rhs.getInteger() > 0 && this->integer + rhs.getInteger() > 0)
+		// cout << this->getInteger() << " - " << rhs.getInteger() << endl;
+		if ((this->integer > 0 && rhs.getInteger() < 0 && this->integer + rhs.getInteger() < 0)
+		|| (this->integer < 0 && rhs.getInteger() > 0 && this->integer + rhs.getInteger() > 0))
 			throw overflow_error("Error: Overflow Number in operator- overload");
 
 		if (this->integer < 0 && rhs.getInteger() > 0)
@@ -267,10 +269,11 @@ public:
 	};
 	Number	&operator*(Number const &rhs)
 	{
-		if (this->integer > 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() < 0
-		|| this->integer < 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() < 0
-		|| this->integer > 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() > 0
-		|| this->integer < 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() > 0)
+		// cout << this->getInteger() << " * " << rhs.getInteger() << endl;
+		if ((this->integer > 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() < 0)
+		|| (this->integer < 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() < 0)
+		|| (this->integer > 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() > 0)
+		|| (this->integer < 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() > 0))
 			throw overflow_error("Error: Overflow Number in operator* overload");
 
 		this->integer *= rhs.getInteger();
@@ -278,10 +281,11 @@ public:
 	};
 	Number	&operator/(Number const &rhs)
 	{
-		if (this->integer > 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() < 0
-		|| this->integer < 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() < 0
-		|| this->integer > 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() > 0
-		|| this->integer < 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() > 0)
+		// cout << this->getInteger() << " / " << rhs.getInteger() << endl;
+		if ((this->integer > 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() < 0)
+		|| (this->integer < 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() < 0)
+		|| (this->integer > 0 && rhs.getInteger() < 0 && this->integer * rhs.getInteger() > 0)
+		|| (this->integer < 0 && rhs.getInteger() > 0 && this->integer * rhs.getInteger() > 0))
 			throw overflow_error("Error: Overflow Number in operator/ overload");
 
 		this->integer /= rhs.getInteger();
@@ -314,8 +318,8 @@ public:
 
 	Number	&operator+=(char const &rhs)
 	{
-		if (this->integer > 0 && this->integer * 10 < 0 
-		||  this->integer < 0 && this->integer * 10 > 0)
+		if ((this->integer > 0 && this->integer * 10 < 0) 
+		||  (this->integer < 0 && this->integer * 10 > 0))
 			throw overflow_error("Error: Overflow Number in operator+= overload");
 		this->integer *= 10;
 		this->integer += rhs - '0';
