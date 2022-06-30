@@ -1,8 +1,8 @@
 NAME = simple_interpreter
 
 CC = clang++
-DEBUG_FLAG = -g -Wfatal-errors -Wpedantic -Wconversion -Wshadow
-CC_FLAGS = -Wall -Wextra -Werror #-std=c++98 -g #${DEBUG_FLAG}
+DEBUG_FLAG = -g -Wfatal-errors -Wshadow
+CC_FLAGS = -Wall -Wextra -Werror   ${DEBUG_FLAG}
 
 
 SRCS =	srcs/main.cpp\
