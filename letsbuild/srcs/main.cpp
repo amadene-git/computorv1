@@ -27,10 +27,6 @@ using namespace std;
 
 
 
-
-
-
-
 int main()
 {
     string input;

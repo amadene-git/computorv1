@@ -35,6 +35,7 @@ string	to_str(T value)
 
 ostream	&operator<<(ostream &out, Number const &src);
 
+
 class Number
 {
 private:

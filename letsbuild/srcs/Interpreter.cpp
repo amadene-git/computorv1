@@ -61,6 +61,7 @@ Number	Interpreter::interpret()
 		_parser->error();
 	this->calcul(ast);
 	Number	result = ast->data.getValue();
+	cout << *ast << endl;
 	clear_btree(ast);
 	return (result);
 }

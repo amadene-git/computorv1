@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 class   Token
 {
 private:

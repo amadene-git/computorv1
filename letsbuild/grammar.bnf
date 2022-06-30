@@ -2,7 +2,7 @@ expr: 			term ((MINUS | PLUS) term)*
 
 term:			factor ((MUL | DIV) factor)*
 
-factor: 		((MINUS | PLUS)* ) (INTEGER | LPAREN expr RPAREN)
+factor: 		((MINUS | PLUS)*) (INTEGER | LPAREN expr RPAREN)
 
 
 INTEGER: DIGIT | DIGIT (INTEGER)*

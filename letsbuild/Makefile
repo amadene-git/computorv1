@@ -4,20 +4,24 @@ CC = clang++
 DEBUG_FLAG = -g -Wfatal-errors -Wshadow
 CC_FLAGS = -Wall -Wextra -Werror   ${DEBUG_FLAG}
 
-
-SRCS =	srcs/main.cpp\
-		srcs/Node.cpp\
-		srcs/Token.cpp\
-		srcs/Lexer.cpp\
-		srcs/Parser.cpp\
-		srcs/Interpreter.cpp\
-
-
-
-OBJS = $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
 OBJS_DIR = ./objs
+SRCS_DIR = ./srcs
+
+SRCS =	$(addprefix $(SRCS_DIR)/, \
+		main.cpp\
+		Node.cpp\
+		Token.cpp\
+		Lexer.cpp\
+		Parser.cpp\
+		Interpreter.cpp\
+		)
+
+
+OBJS = $(SRCS:%.cpp=$(addprefix $(OBJS_DIR)/, %.o))
 DEP = $(OBJS:%.o=%.d)
 HEADER = -I ./includes/
+
+
 
 all				: 	${NAME}
 $(NAME) 		: 	$(OBJS)	

@@ -28,13 +28,13 @@ Node	&Node::operator=(Node const &rhs)
 //OSTREAM
 ostream	&operator<<(ostream &out, Node const &src)
 {
-	print_btree(out, &src);
+	print_btree(&src, 0, 0, -1, out);
 	return (out);
 }
 
 
 //EXTERNAL FUNCTIONS
-void	print_btree(ostream &out, Node const *root, int a, int lvl, int max)
+void	print_btree(Node const *root, int a, int lvl, int max, ostream &out)
 {
 	if (!root)
 	{
@@ -42,7 +42,7 @@ void	print_btree(ostream &out, Node const *root, int a, int lvl, int max)
 		return;
 	}
 	if (root->right && (lvl <= max || max == -1))
-		print_btree(out, root->right, 0, lvl + 1, max);
+		print_btree(root->right, 0, lvl + 1, max, out);
 	for (int k = 1	; k < lvl; k++)
 		for (int i = 0; i < 20; i++)
 			out << " ";
@@ -68,7 +68,7 @@ void	print_btree(ostream &out, Node const *root, int a, int lvl, int max)
 	}
 	out << endl;
 	if (root->left && (lvl <= max || max == -1))
-		print_btree(out, root->left, 1, lvl + 1, max);
+		print_btree(root->left, 1, lvl + 1, max, out);
 }
 
 void	clear_btree(Node *root)

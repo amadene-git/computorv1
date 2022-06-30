@@ -7,6 +7,9 @@
 # include "./Token.hpp"
 # include "./Lexer.hpp"
 
+using namespace std;
+
+
 class   Parser
 {
 private:

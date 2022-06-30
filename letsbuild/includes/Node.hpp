@@ -5,6 +5,9 @@
 
 # include "./Token.hpp"
 
+using namespace std;
+
+
 class Node
 {
 public:
@@ -22,7 +25,7 @@ public:
 ostream	&operator<<(ostream &out, Node const &src);
 
 
-void	print_btree(ostream &out, Node const *root = NULL, int a = 0, int lvl = 0, int max = -1);
+void	print_btree(Node const *root = NULL, int a = 0, int lvl = 0, int max = -1, ostream &out = cout);
 void	clear_btree(Node *root);
 
 #endif

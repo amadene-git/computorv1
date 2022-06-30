@@ -63,10 +63,27 @@ void	Parser::eat(string token_type)
 Node	*Parser::factor()
 {
 	Token	token = _current_token;
+	int		sign = 1;
+
+
+	while (token.getType() == MINUS || token.getType() == PLUS)
+	{
+		if (token.getType() == PLUS)
+			this->eat(PLUS);
+		else if (token.getType() == MINUS)
+		{
+			this->eat(MINUS);
+			sign *= -1;			
+		}
+	
+		token = _current_token;
+	}
 
 	if (token.getType() == INTEGER)
-	{
+	{	
 		this->eat(INTEGER);
+		
+		token.setValue(token.getValue() * Number(sign));
 		return (new Node(token));
 	}
 	else if (_current_token.getType() == LPAREN)
@@ -74,6 +91,7 @@ Node	*Parser::factor()
 		this->eat(LPAREN);
 		Node *node = this->expr();
 		this->eat(RPAREN);
+		node->data.setValue(node->data.getValue() * Number(sign));
 		return (node);
 	}
 	return (NULL);
