@@ -1,8 +1,12 @@
+equation:       expr EQUAL expr
+
 expr: 			term ((MINUS | PLUS) term)*
 
-term:			factor ((MUL | DIV) factor)*
+term:			exponent ((MUL | DIV) exponent)*
 
-factor: 		((MINUS | PLUS)*) (INTEGER | LPAREN expr RPAREN)
+exponent:       factor (EXPO factor)*
+
+factor: 		((MINUS | PLUS)*) (INTEGER | LPAREN expr RPAREN) (X)
 
 
 INTEGER: DIGIT | DIGIT (INTEGER)*
@@ -13,3 +17,6 @@ MUL: *
 DIV: /
 LPAREN: (
 RPAREN: )
+EQUAL: =
+EXPO: ^
+X   : x

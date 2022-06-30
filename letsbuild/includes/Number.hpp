@@ -331,6 +331,24 @@ public:
 	};
 
 
+	Number	exponent(Number const &src)
+	{
+		if (src.getInteger() <= 0)
+			return (1);
+		
+		int i = 1;
+		Number ret = *this;
+
+		while (i < src.getInteger())
+		{
+			cout << i << " < " << src.getInteger() << "   -> "<< *this << endl;
+			*this *= ret;
+			++i;
+		}
+		return (*this);
+	};
+
+
 };
 
 #endif

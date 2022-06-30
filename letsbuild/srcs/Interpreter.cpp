@@ -52,6 +52,8 @@ void	Interpreter::calcul(Node *node)
 		node->data.setValue((node->left->data.getValue() * node->right->data.getValue()));
     else if (node->data.getType() == DIV)	
 		node->data.setValue((node->left->data.getValue() / node->right->data.getValue()));
+    else if (node->data.getType() == EXPO)	
+		node->data.setValue(node->left->data.getValue().exponent(node->right->data.getValue()));
 }
 
 Number	Interpreter::interpret()
@@ -59,6 +61,7 @@ Number	Interpreter::interpret()
 	Node	*ast = _parser->parse();
 	if (_parser->getCurrent_token().getType() != EOL)
 		_parser->error();
+	
 	this->calcul(ast);
 	Number	result = ast->data.getValue();
 	cout << *ast << endl;

@@ -32,9 +32,11 @@ public:
 	void	error();
 	void	eat(string token_type);
 	Node	*factor();
+	Node	*exponent();
 	Node	*term();
 	Node	*expr();
 	Node	*parse();
+	Node	*equation();
 };
 
 #endif

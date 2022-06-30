@@ -1,4 +1,5 @@
 #include "./Lexer.hpp"
+#include "./Coefficient.hpp"
 
 //CONSTRUCTORS
 Lexer::Lexer()
@@ -132,6 +133,18 @@ Token	Lexer::get_next_token()
 			this->advance();
 			return (Token(RPAREN, 0));
 		}
+		if (_current_char == '=')
+		{
+			this->advance();
+			return (Token(EQUAL, 0));
+		}
+		if (_current_char == '^')
+		{
+			this->advance();
+			return (Token(EXPO, 0));
+		}
+
+
 
 		this->error();
 	}

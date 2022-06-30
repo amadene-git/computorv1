@@ -10,5 +10,8 @@
 # define	ERR		"ERR"
 # define	LPAREN	"LPAREN"
 # define	RPAREN	"RPAREN"
+# define	EQUAL	"EQUAL"
+# define    EXPO    "EXPO"
+# define	X	    "X"
 
 #endif

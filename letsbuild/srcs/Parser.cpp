@@ -97,9 +97,23 @@ Node	*Parser::factor()
 	return (NULL);
 }
 
+Node	*Parser::exponent()
+{
+	Node *node = factor();
+
+	while (_current_token.getType() == EXPO)
+	{
+		Token token = _current_token;
+		if (_current_token.getType() == EXPO)
+			eat(EXPO);
+		node = new Node(token, node, this->factor());
+	}
+	return (node);
+}
+
 Node	*Parser::term()
 {
-	Node *node = this->factor();
+	Node *node = this->exponent();
 
 	while (	_current_token.getType() == MUL
 	||		_current_token.getType() == DIV)
@@ -113,7 +127,7 @@ Node	*Parser::term()
 		{
 			this->eat(DIV);
 		}
-		node = new Node(token, node, this->factor());
+		node = new Node(token, node, this->exponent());
 	}
 	return (node);
 }
@@ -137,6 +151,16 @@ Node	*Parser::expr()
 		node = new Node(token, node, this->term());
 	}
 	return (node);		
+}
+
+
+Node	*Parser::equation()
+{
+	Node *node = this->expr();
+
+	eat(EQUAL);
+
+	return (new Node(Token(EQUAL, 0), node, this->expr()));
 }
 
 Node	*Parser::parse()
