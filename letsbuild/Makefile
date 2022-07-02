@@ -14,6 +14,7 @@ SRCS =	$(addprefix $(SRCS_DIR)/, \
 		Lexer.cpp\
 		Parser.cpp\
 		Interpreter.cpp\
+		Coefficient.cpp\
 		)
 
 

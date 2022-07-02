@@ -77,7 +77,7 @@ void	Lexer::skip_whitespace()
 		this->advance();
 }
 
-Number	Lexer::integer()
+Coefficient	Lexer::integer()
 {
 	string result;
 
@@ -86,7 +86,7 @@ Number	Lexer::integer()
 		result += _current_char;
 		this->advance();
 	}
-	return (result);
+	return (Coefficient(Number(), Number(), Number(result)));
 }
 
 Token	Lexer::get_next_token()
@@ -106,47 +106,53 @@ Token	Lexer::get_next_token()
 		if (_current_char == '+')
 		{
 			this->advance();
-			return (Token(PLUS, 0));
+			return (Token(PLUS, Coefficient()));
 		}
 		if (_current_char == '-')
 		{
 			this->advance();
-			return (Token(MINUS, 0));
+			return (Token(MINUS, Coefficient()));
 		}
 		if (_current_char == '*')
 		{
 			this->advance();
-			return (Token(MUL, 0));
+			return (Token(MUL, Coefficient()));
 		}
 		if (_current_char == '/')
 		{
 			this->advance();
-			return (Token(DIV, 0));
+			return (Token(DIV, Coefficient()));
 		}
 		if (_current_char == '(')
 		{
 			this->advance();
-			return (Token(LPAREN, 0));
+			return (Token(LPAREN, Coefficient()));
 		}
 		if (_current_char == ')')
 		{
 			this->advance();
-			return (Token(RPAREN, 0));
+			return (Token(RPAREN, Coefficient()));
 		}
 		if (_current_char == '=')
 		{
 			this->advance();
-			return (Token(EQUAL, 0));
+			return (Token(EQUAL, Coefficient()));
 		}
 		if (_current_char == '^')
 		{
 			this->advance();
-			return (Token(EXPO, 0));
+			return (Token(EXPO, Coefficient()));
+		}
+		if (_current_char == 'x')
+		{
+			this->advance();
+			// cout << Coefficient(0, 1, 0) << endl;
+			return (Token(X, Coefficient(Number(), 1, Number())));
 		}
 
 
 
 		this->error();
 	}
-	return (Token(EOL, 0));
+	return (Token(EOL, Coefficient()));
 }

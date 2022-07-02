@@ -5,7 +5,7 @@
 # include <sstream>
 # include <iostream>
 
-# include "./Number.hpp"
+# include "./Coefficient.hpp"
 
 using namespace std;
 
@@ -14,20 +14,20 @@ class   Token
 {
 private:
 	string	_type;
-	Number	_value;
+	Coefficient	_value;
 
 public:
 	Token();
-	Token(string type, Number value);
+	Token(string type, Coefficient value);
 	Token(Token const &src);
 	~Token();
 
 	Token	&operator=(Token const &rhs);
 
 	string	getType()	const;
-	Number	getValue()	const;
+	Coefficient	getValue()	const;
 	void	setType(const string type);
-	void	setValue(const Number value);        
+	void	setValue(const Coefficient value);        
         
 	string repr()	const;
 };

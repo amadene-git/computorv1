@@ -62,39 +62,52 @@ void	Parser::eat(string token_type)
 
 Node	*Parser::factor()
 {
-	Token	token = _current_token;
+	Token	token;
+	Node 	*node = NULL;
+
 	int		sign = 1;
 
-
-	while (token.getType() == MINUS || token.getType() == PLUS)
+	while (_current_token.getType() == MINUS || _current_token.getType() == PLUS)
 	{
-		if (token.getType() == PLUS)
+		if (_current_token.getType() == PLUS)
 			this->eat(PLUS);
-		else if (token.getType() == MINUS)
+		else if (_current_token.getType() == MINUS)
 		{
 			this->eat(MINUS);
 			sign *= -1;			
 		}
 	
-		token = _current_token;
 	}
 
-	if (token.getType() == INTEGER)
+	if (_current_token.getType() == INTEGER)
 	{	
+		token = _current_token;
 		this->eat(INTEGER);
 		
 		token.setValue(token.getValue() * Number(sign));
-		return (new Node(token));
+		node = new Node(token);
 	}
 	else if (_current_token.getType() == LPAREN)
 	{
 		this->eat(LPAREN);
-		Node *node = this->expr();
+		node = this->expr();
 		this->eat(RPAREN);
+
 		node->data.setValue(node->data.getValue() * Number(sign));
-		return (node);
 	}
-	return (NULL);
+	else if (_current_token.getType() == X)
+	{
+		token = _current_token;
+		this->eat(X);
+		
+		token.setValue(token.getValue() * Number(sign));
+		node = new Node(token);
+	}
+	else
+		node = new Node(Token(ERR, Coefficient()));
+
+	// cout << node->data << endl;
+	return (node);
 }
 
 Node	*Parser::exponent()
@@ -160,7 +173,7 @@ Node	*Parser::equation()
 
 	eat(EQUAL);
 
-	return (new Node(Token(EQUAL, 0), node, this->expr()));
+	return (new Node(Token(EQUAL, Coefficient()), node, this->expr()));
 }
 
 Node	*Parser::parse()

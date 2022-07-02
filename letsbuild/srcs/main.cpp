@@ -17,8 +17,6 @@
 std::ostream	&operator<<(std::ostream &out, Number const &src)
 {
 	out << src.getInteger();
-	if (src.getDecimal())
-		out << "." << src.getDecimal();
 
 	return (out);
 }
@@ -47,7 +45,7 @@ int main()
 			Lexer		lexer(input);
             Parser 		parser(lexer);
 			Interpreter	interpreter(parser);
-			Number		result = interpreter.interpret();
+			Coefficient		result = interpreter.interpret();
 			
 			cout << result << endl; 
         }

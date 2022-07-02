@@ -4,6 +4,8 @@
 # include "./Node.hpp"
 # include "./Number.hpp"
 # include "./Parser.hpp"
+# include "./Coefficient.hpp"
+
 
 
 class	Interpreter
@@ -23,7 +25,7 @@ public:
 	void	setParser(Parser &parser);
 
 	void	calcul(Node *node);
-	Number	interpret();
+	Coefficient	interpret();
 };
 
 #endif

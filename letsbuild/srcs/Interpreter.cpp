@@ -44,26 +44,29 @@ void	Interpreter::calcul(Node *node)
 	if (node->right)
 		calcul(node->right);
 	
-	if (node->data.getType() == PLUS)	
-		node->data.setValue((node->left->data.getValue() + node->right->data.getValue()));
-    else if (node->data.getType() == MINUS)	
+	if (node->data.getType() == PLUS)
+		node->data.setValue(node->left->data.getValue() + node->right->data.getValue());
+	else if (node->data.getType() == MINUS)	
 		node->data.setValue((node->left->data.getValue() - node->right->data.getValue()));
     else if (node->data.getType() == MUL)	
 		node->data.setValue((node->left->data.getValue() * node->right->data.getValue()));
     else if (node->data.getType() == DIV)	
 		node->data.setValue((node->left->data.getValue() / node->right->data.getValue()));
-    else if (node->data.getType() == EXPO)	
-		node->data.setValue(node->left->data.getValue().exponent(node->right->data.getValue()));
+    // else if (node->data.getType() == EXPO)	
+	// 	node->data.setValue(node->left->data.getValue().exponent(node->right->data.getValue()));
+    else if (node->data.getType() == ERR)
+		_parser->error();
+
 }
 
-Number	Interpreter::interpret()
+Coefficient	Interpreter::interpret()
 {
 	Node	*ast = _parser->parse();
 	if (_parser->getCurrent_token().getType() != EOL)
 		_parser->error();
 	
 	this->calcul(ast);
-	Number	result = ast->data.getValue();
+	Coefficient	result = ast->data.getValue();
 	cout << *ast << endl;
 	clear_btree(ast);
 	return (result);
