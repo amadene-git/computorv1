@@ -6,6 +6,7 @@
 # include "./Node.hpp"
 # include "./Token.hpp"
 # include "./Lexer.hpp"
+# include "./Coeff.hpp"
 
 using namespace std;
 

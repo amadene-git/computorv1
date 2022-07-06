@@ -11,6 +11,7 @@
 #include "./Lexer.hpp"
 #include "./Parser.hpp"
 #include "./Interpreter.hpp"
+#include "./Coeff.hpp"
 
 
 
@@ -45,7 +46,7 @@ int main()
 			Lexer		lexer(input);
             Parser 		parser(lexer);
 			Interpreter	interpreter(parser);
-			Coefficient		result = interpreter.interpret();
+			Coeff		result = interpreter.interpret();
 			
 			cout << result << endl; 
         }
@@ -55,5 +56,27 @@ int main()
         }
         
     }
+
+    // Coeff var(5, 3);
+
+    // cout << var << endl;
+
+    // var += 3;
+
+    // Coeff var2(7, 3);
+    // var2 += 8;
+
+    // cout << "var :"<< var << endl;
+    // cout << "var2 :"<< var2 << endl << endl;
+
+    // var = var + var2;
+
+    // cout << "var :"<< var << endl;
+    // cout << "var2 :"<< var2 << endl << endl;
+
+    // var = var * var2;
+
+    // cout << "var :"<< var << endl;
+    // cout << "var2 :"<< var2 << endl <<endl;
 
 }

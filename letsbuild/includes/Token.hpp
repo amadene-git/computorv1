@@ -5,7 +5,7 @@
 # include <sstream>
 # include <iostream>
 
-# include "./Coefficient.hpp"
+# include "./Coeff.hpp"
 
 using namespace std;
 
@@ -14,20 +14,20 @@ class   Token
 {
 private:
 	string	_type;
-	Coefficient	_value;
+	Coeff	_value;
 
 public:
 	Token();
-	Token(string type, Coefficient value);
+	Token(string type, Coeff value);
 	Token(Token const &src);
 	~Token();
 
 	Token	&operator=(Token const &rhs);
 
 	string	getType()	const;
-	Coefficient	getValue()	const;
+	Coeff	getValue()	const;
 	void	setType(const string type);
-	void	setValue(const Coefficient value);        
+	void	setValue(const Coeff value);        
         
 	string repr()	const;
 };

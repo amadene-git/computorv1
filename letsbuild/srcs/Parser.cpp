@@ -104,7 +104,7 @@ Node	*Parser::factor()
 		node = new Node(token);
 	}
 	else
-		node = new Node(Token(ERR, Coefficient()));
+		node = new Node(Token(ERR, Coeff()));
 
 	// cout << node->data << endl;
 	return (node);
@@ -173,7 +173,7 @@ Node	*Parser::equation()
 
 	eat(EQUAL);
 
-	return (new Node(Token(EQUAL, Coefficient()), node, this->expr()));
+	return (new Node(Token(EQUAL, Coeff()), node, this->expr()));
 }
 
 Node	*Parser::parse()

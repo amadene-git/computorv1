@@ -4,7 +4,7 @@
 Token::Token()
 : _type(), _value() {}
 
-Token::Token(string type, Coefficient value)
+Token::Token(string type, Coeff value)
 : _type(type), _value(value) {}
 
 Token::Token(Token const &src)
@@ -30,7 +30,7 @@ string	Token::getType()	const
 {
 	return (_type); 
 }
-Coefficient	Token::getValue()	const
+Coeff	Token::getValue()	const
 {
 	return (_value); 
 }
@@ -40,7 +40,7 @@ void	Token::setType(const string type)
 {
 	_type = type;
 }
-void	Token::setValue(const Coefficient value)
+void	Token::setValue(const Coeff value)
 {
 	_value = value;
 }        

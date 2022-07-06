@@ -50,23 +50,28 @@ void	Interpreter::calcul(Node *node)
 		node->data.setValue((node->left->data.getValue() - node->right->data.getValue()));
     else if (node->data.getType() == MUL)	
 		node->data.setValue((node->left->data.getValue() * node->right->data.getValue()));
-    else if (node->data.getType() == DIV)	
+    else if (node->data.getType() == DIV)
+	{
+		if (!node->right->data.getValue())
+			throw logic_error("Interpreter Error: Divide by zero");
 		node->data.setValue((node->left->data.getValue() / node->right->data.getValue()));
-    // else if (node->data.getType() == EXPO)	
-	// 	node->data.setValue(node->left->data.getValue().exponent(node->right->data.getValue()));
+
+	}
+	else if (node->data.getType() == EXPO)
+		node->data.setValue(node->left->data.getValue().exponent(node->right->data.getValue()));
     else if (node->data.getType() == ERR)
 		_parser->error();
 
 }
 
-Coefficient	Interpreter::interpret()
+Coeff	Interpreter::interpret()
 {
 	Node	*ast = _parser->parse();
 	if (_parser->getCurrent_token().getType() != EOL)
 		_parser->error();
 	
 	this->calcul(ast);
-	Coefficient	result = ast->data.getValue();
+	Coeff	result = ast->data.getValue();
 	cout << *ast << endl;
 	clear_btree(ast);
 	return (result);

@@ -2,7 +2,7 @@ NAME = simple_interpreter
 
 CC = clang++
 DEBUG_FLAG = -g -Wfatal-errors -Wshadow
-CC_FLAGS = -Wall -Wextra -Werror   ${DEBUG_FLAG}
+CC_FLAGS = -Wall -Wextra -Werror -g  ${DEBUG_FLAG}
 
 OBJS_DIR = ./objs
 SRCS_DIR = ./srcs
@@ -14,7 +14,8 @@ SRCS =	$(addprefix $(SRCS_DIR)/, \
 		Lexer.cpp\
 		Parser.cpp\
 		Interpreter.cpp\
-		Coefficient.cpp\
+		Number.cpp\
+		Coeff.cpp\
 		)
 
 

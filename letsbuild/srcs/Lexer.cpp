@@ -1,5 +1,5 @@
 #include "./Lexer.hpp"
-#include "./Coefficient.hpp"
+#include "./Coeff.hpp"
 
 //CONSTRUCTORS
 Lexer::Lexer()
@@ -77,7 +77,7 @@ void	Lexer::skip_whitespace()
 		this->advance();
 }
 
-Coefficient	Lexer::integer()
+Coeff	Lexer::integer()
 {
 	string result;
 
@@ -86,7 +86,7 @@ Coefficient	Lexer::integer()
 		result += _current_char;
 		this->advance();
 	}
-	return (Coefficient(Number(), Number(), Number(result)));
+	return (Coeff(result, 0));
 }
 
 Token	Lexer::get_next_token()
@@ -106,53 +106,53 @@ Token	Lexer::get_next_token()
 		if (_current_char == '+')
 		{
 			this->advance();
-			return (Token(PLUS, Coefficient()));
+			return (Token(PLUS, Coeff()));
 		}
 		if (_current_char == '-')
 		{
 			this->advance();
-			return (Token(MINUS, Coefficient()));
+			return (Token(MINUS, Coeff()));
 		}
 		if (_current_char == '*')
 		{
 			this->advance();
-			return (Token(MUL, Coefficient()));
+			return (Token(MUL, Coeff()));
 		}
 		if (_current_char == '/')
 		{
 			this->advance();
-			return (Token(DIV, Coefficient()));
+			return (Token(DIV, Coeff()));
 		}
 		if (_current_char == '(')
 		{
 			this->advance();
-			return (Token(LPAREN, Coefficient()));
+			return (Token(LPAREN, Coeff()));
 		}
 		if (_current_char == ')')
 		{
 			this->advance();
-			return (Token(RPAREN, Coefficient()));
+			return (Token(RPAREN, Coeff()));
 		}
 		if (_current_char == '=')
 		{
 			this->advance();
-			return (Token(EQUAL, Coefficient()));
+			return (Token(EQUAL, Coeff()));
 		}
 		if (_current_char == '^')
 		{
 			this->advance();
-			return (Token(EXPO, Coefficient()));
+			return (Token(EXPO, Coeff()));
 		}
 		if (_current_char == 'x')
 		{
 			this->advance();
-			// cout << Coefficient(0, 1, 0) << endl;
-			return (Token(X, Coefficient(Number(), 1, Number())));
+			// cout << Coeff(0, 1, 0) << endl;
+			return (Token(X, Coeff(1, 1)));
 		}
 
 
 
 		this->error();
 	}
-	return (Token(EOL, Coefficient()));
+	return (Token(EOL, Coeff()));
 }

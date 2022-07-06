@@ -5,7 +5,7 @@
 # include <stdexcept>
 
 # include "./Token.hpp"
-# include "./Coefficient.hpp"
+# include "./Coeff.hpp"
 # include "./Token_type.hpp"
 
 using namespace std;
@@ -36,7 +36,7 @@ public:
 	void	error();
 	void	advance();
 	void	skip_whitespace();
-	Coefficient	integer();
+	Coeff	integer();
 	Token	get_next_token();
 };
 

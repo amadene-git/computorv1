@@ -4,7 +4,7 @@
 # include "./Node.hpp"
 # include "./Number.hpp"
 # include "./Parser.hpp"
-# include "./Coefficient.hpp"
+# include "./Coeff.hpp"
 
 
 
@@ -25,7 +25,7 @@ public:
 	void	setParser(Parser &parser);
 
 	void	calcul(Node *node);
-	Coefficient	interpret();
+	Coeff	interpret();
 };
 
 #endif
