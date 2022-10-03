@@ -13,7 +13,7 @@
 #include "./Interpreter.hpp"
 #include "./Coeff.hpp"
 
-
+#include "./Pint.hpp"
 
 std::ostream	&operator<<(std::ostream &out, Number const &src)
 {
@@ -28,34 +28,40 @@ using namespace std;
 
 int main()
 {
-    string input;
-    while (1)
-    {
-        try
-        {
-            cout << "calc> ";
-            if (getline(cin, input, '\n').eof())
-			{
-				return (0);
-			}
-            if (!input.length())
-                continue;
-			if (input == "quit" || input == "exit")
-				return (0);
+	Pint nbr(-9223372036854775807L);
+	std::cout << nbr << std::endl;
+	
+	nbr = nbr - 11;
+	std::cout << nbr << std::endl;
+	// std::cout << nbr << std::endl;
+	// string input;
+    // while (1)
+    // {
+    //     try
+    //     {
+    //         cout << "calc> ";
+    //         if (getline(cin, input, '\n').eof())
+	// 		{
+	// 			return (0);
+	// 		}
+    //         if (!input.length())
+    //             continue;
+	// 		if (input == "quit" || input == "exit")
+	// 			return (0);
 
-			Lexer		lexer(input);
-            Parser 		parser(lexer);
-			Interpreter	interpreter(parser);
-			Coeff		result = interpreter.interpret();
+	// 		Lexer		lexer(input);
+    //         Parser 		parser(lexer);
+	// 		Interpreter	interpreter(parser);
+	// 		Coeff		result = interpreter.interpret();
 			
-			cout << result << endl; 
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
-        }
+	// 		cout << result << endl; 
+    //     }
+    //     catch(const std::exception& e)
+    //     {
+    //         std::cerr << e.what() << '\n';
+    //     }
         
-    }
+    // }
 
     // Coeff var(5, 3);
 

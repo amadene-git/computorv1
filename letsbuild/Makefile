@@ -16,6 +16,7 @@ SRCS =	$(addprefix $(SRCS_DIR)/, \
 		Interpreter.cpp\
 		Number.cpp\
 		Coeff.cpp\
+		Pint.cpp\
 		)
 
 
