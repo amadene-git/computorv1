@@ -1,13 +1,16 @@
 expr    : term ((PLUS | MINUS) term)*
 term    : factor ((MUL | DIV) factor)*
-factor  : INTEGER | LPAR expr  | X
-
-
+factor  : LPAR expr RPAR | expo
+expo	: coeff ((EXPO) INTEGER)
+coeff	: (INTEGER (X)) | X
+ 
 INTEGER = DIGIT (DIGIT)*
-DIGIT   = 0|1|2|3|4|5|6|7|8|9
-PLUS    = +
-MINUS   = -
-MUL     = *
-DIV     = /
-LPAR    = (
-RPAR    = )
+DIGIT   = '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
+PLUS    = '+'
+MINUS   = '-'
+MUL     = '*'
+DIV     = '/'
+LPAR    = '('
+RPAR    = ')'
+X		= 'X' | 'x'
+EXPO	= '^'

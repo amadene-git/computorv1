@@ -7,6 +7,7 @@ EOF     = 'EOF'
 LPAR    = '('
 RPAR    = ')'
 X       = 'X'
+EXPO	= '^'
 
 # import argparse
 # import textwrap
@@ -122,17 +123,17 @@ class Coeff(object):
         return Coeff(ret)
 
 
-from Token import Token
-# class Token(object):
-#     def __init__(self, type, value):
-#         self.type = type
-#         self.value = value
+# from Token import Token
+class Token(object):
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
 
-#     def __str__(self):
-#         return f'Token({self.type}, {repr(self.value)})'
+    def __str__(self):
+        return f'Token({self.type}, {repr(self.value)})'
 
-#     def __repr__(self):
-#         return self.__str__()
+    def __repr__(self):
+        return self.__str__()
 
 # from Lexer import Lexer
 class Lexer(object):
@@ -202,9 +203,13 @@ class Lexer(object):
                 self.advance()
                 return Token(RPAR, ')')
             
-            if self.current_char == 'X':
+            if self.current_char == 'X' or self.current_char == 'x':
                 self.advance()
                 return Token(X, Coeff({1: Number(1)}))
+            
+            if self.current_char == '^':
+                self.advance()
+                return Token(EXPO, '^')
             self.error()
         return Token(EOF, None)
 
@@ -285,23 +290,35 @@ class Parser(object):
         else:
             self.error()
 
+    def coeff(self):
+        
+        token = self.current_token
+        if token.type == INTEGER:
+            self.eat(INTEGER)
+            if self.current_token.type == X:
+                self.eat(X)
+                token.value = Coeff({1: token.value.dict_x[0]})
+            return Node(token)
+        if token.type == X:
+            self.eat(X)
+            return Node(token)
+        self.error()
+
+    # def expo(self):
+    #     node = self.coeff()
+    #     while self.current_token.type == EXPO:
+    #         node = Node(data = self.current_token, left = node, right = self.integer())	
     def factor(self):
         
         token = self.current_token
         
-        if token.type == INTEGER:
-            self.eat(INTEGER)
-            return Node(token)
-        elif token.type == LPAR:
+        if token.type == LPAR:
             self.eat(LPAR)
             node = self.expr()
             self.eat(RPAR)
             return node
-        elif token.type == X:
-            self.eat(X)
-            return Node(token)
-        else:
-            raise Exception("Parser error")
+
+        return self.coeff()
 
     def term(self):
         
