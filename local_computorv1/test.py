@@ -1,7 +1,0 @@
-print("salut".__hash__())
-print("salut".__hash__())
-print("salut".__hash__())
-print("salut".__hash__())
-print("salut".__hash__())
-print("salut".__hash__())
-print("salut".__hash__())

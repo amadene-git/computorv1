@@ -1,9 +1,0 @@
-digraph astgraph {
-  node [shape=none, fontsize=12, fontname="Courier", height=.1];
-  ranksep=.5;
-  edge [arrowsize=.5]
-
-  node0 [label="Token(INTEGER, 12)"]
-
-
-}
