@@ -1,68 +1,38 @@
-INTEGER = 'INTEGER'
-PLUS    = 'PLUS'
-MINUS   = 'MINUS'
-MUL     = 'MUL'
-DIV     = 'DIV'
-EOF     = 'EOF'
-LPAR    = '('
-RPAR    = ')'
-X       = 'X'
-EXPO	= '^'
+from includes.includes import *
 
-# import argparse
-# import textwrap
 import os
 
-# from spi import PLUS, MINUS, MUL, DIV, INTEGER, LPAREN, RPAREN, Lexer
 
-class Number(object):
-    def __init__(self, num = 0, denom = 1):
-        self.num = num
-        self.denom = denom
-    
-    def __add__(self, rhs):
-        if not isinstance(rhs, Number):
-            raise Exception("Number add error")
-        return Number(self.num * rhs.denom + self.denom * rhs.num, self.denom * rhs.denom)
-
-    def __sub__(self, rhs):
-        if not isinstance(rhs, Number):
-            raise Exception("Number sub error")
-        return Number(self.num * rhs.denom - self.denom * rhs.num, self.denom * rhs.denom)
-
-    def __mul__(self, rhs):
-        if not isinstance(rhs, Number):
-            raise Exception("Number mul error")
-        return Number(self.num * rhs.num, self.denom * rhs.denom)
-
-    def __truediv__(self, rhs):
-        if not isinstance(rhs, Number):
-            raise Exception("Number div error")
-        return Number(self.num * rhs.denom, self.denom * rhs.num)
-
-
-    def __str__(self):
-        ret = f"{self.num}"
-        if self.denom != 1:
-            ret += f"/{self.denom}"
-        return ret
-
-    def __repr__(self):
-        return self.__str__()
-
-
-
+NUMBERNULL = Number(0) # constant null
 class Coeff(object):
+    
     def __init__(self, dict_x):
         if not isinstance(dict_x, dict):
-            print(type(dict_x))
             raise Exception("Coeff error init")
+        for i, j in dict_x.items():
+            if j == 0:
+                dict_x.pop(i)
+        
         self.dict_x = dict_x
 
     def __str__(self):
         ret = ""
         for i, j in self.dict_x.items():
-            ret += f"{j}x^{i} + "
+            
+            if len(ret) > 2 and j.num < 0:
+                ret = ret[:-2]
+                ret += "+ "
+            if i == 0:
+                ret += f"{j} + "
+            else:
+                if j == 1:
+                    ret += "x"
+                else:
+                    ret += f"{j}x"
+                if i != 1:
+                    ret += f"^{i}"
+                ret += " + "
+                
         return ret[:-3]
 
     def __repr__(self):
@@ -73,15 +43,12 @@ class Coeff(object):
 
         for i in self.dict_x.keys():
             if i in rhs.dict_x.keys():
-                print(f"ret: [{i}]{rhs.dict_x[i]}")
                 ret[i] = self.dict_x[i] + rhs.dict_x[i]
             else:
                 ret[i] = self.dict_x[i]
         for i in rhs.dict_x.keys():
             if i not in self.dict_x.keys():
-                print(f"rhs: [{i}]{rhs.dict_x[i]}")
                 ret[i] = rhs.dict_x[i]
-        print(ret)
 
         return Coeff(ret)
 
@@ -95,7 +62,7 @@ class Coeff(object):
                 ret[i] = self.dict_x[i]
         for i in rhs.dict_x.keys():
             if i not in self.dict_x.keys():
-                ret[i] = rhs.dict_x[i]
+                ret[i] = rhs.dict_x[i] * Number(-1)
 
         return Coeff(ret)
 
@@ -122,8 +89,36 @@ class Coeff(object):
                     ret[i - k] = j / n
         return Coeff(ret)
 
+    def __pow__(self, rhs):
+        if not isinstance(rhs, Coeff):
+            raise Exception(f"Coeff.__pow__ error: unsupported operand type(s) for **: 'Coeff' and '{type(rhs)}'")
+        
+        # on verifie qu'i n'y a pas de x dans rhs
+        for i, j in rhs.dict_x.items():
+            if j == 0:
+                rhs.dict_x.pop(i)
+        if len(rhs.dict_x) != 1\
+        or NUMBERNULL not in rhs.dict_x.keys():
+            raise Exception("Coeff.__pow__ error: cannot solve a^x ... yet")
 
-# from Token import Token
+        # on verifie qu'il n'y a qu'un coeff dans self
+        for i, j in self.dict_x.items():
+            if j == 0:
+                self.dict_x.pop(i)
+        if len(self.dict_x) != 1:
+            raise Exception("Coeff.__pow__ error: cannot solve (a + bx + cx^2 +...)^n ... yet")
+        
+
+        # cas a^b
+        if NUMBERNULL in self.dict_x.keys():
+            return Coeff({NUMBERNULL : self.dict_x[NUMBERNULL] ** rhs.dict_x[NUMBERNULL]})
+        
+        # cas (x^n)^k = x^(n + k)
+        else:
+            return Coeff({list(self.dict_x.keys())[0] * rhs.dict_x[NUMBERNULL] : list(self.dict_x.values())[0]})
+
+
+
 class Token(object):
     def __init__(self, type, value):
         self.type = type
@@ -135,15 +130,14 @@ class Token(object):
     def __repr__(self):
         return self.__str__()
 
-# from Lexer import Lexer
 class Lexer(object):
     def __init__(self, text):
         self.text = text
         self.pos = 0
         self.current_char = text[self.pos]
 
-    def error(self):
-        raise Exception('Error Lexer')
+    def error(self, msg = ""):
+        raise Exception(f'Error Lexer : {msg}')
 
     def advance(self):
         self.pos += 1
@@ -167,7 +161,7 @@ class Lexer(object):
         and self.current_char.isdigit():
             ret += self.current_char
             self.advance()
-        return (Coeff({0: Number(int(ret))}))
+        return (Coeff({Number(0): Number(int(ret))}))
 
     def get_next_token(self):
         while self.current_char is not None:
@@ -205,12 +199,14 @@ class Lexer(object):
             
             if self.current_char == 'X' or self.current_char == 'x':
                 self.advance()
-                return Token(X, Coeff({1: Number(1)}))
+                return Token(X, Coeff({Number(1): Number(1)}))
             
             if self.current_char == '^':
                 self.advance()
-                return Token(EXPO, '^')
-            self.error()
+                return Token(POWER, '^')
+        
+            self.error(f"Bad character {self.current_char}")
+        
         return Token(EOF, None)
 
 
@@ -266,8 +262,8 @@ class BTree(object):
         self.dotf += "\n\n}"
         os.system(f"echo '{self.dotf}' > tmp.dot")
         os.system(f"dot -Tpng -o tree.png tmp.dot")
-        os.system(f"open tree.png")
-        os.system(f"rm -rf tmp.dot")
+        os.system(f"xdg-open tree.png")
+        #os.system(f"rm -rf tmp.dot")
 
 def print_btree(root):
     BTree(root).print_btree()
@@ -279,8 +275,8 @@ class Parser(object):
         self.current_token = lexer.get_next_token()
 
 
-    def error(self):
-        raise Exception('Error Interpreter')
+    def error(self, msg = ""):
+        raise Exception(f'Error Interpreter: {msg}')
 
 
     def eat(self, token_type):
@@ -288,7 +284,7 @@ class Parser(object):
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            self.error()
+            self.error(f"Unexpected '{self.current_token.type}' token instead of '{token_type}' token ")
 
     def coeff(self):
         
@@ -297,17 +293,22 @@ class Parser(object):
             self.eat(INTEGER)
             if self.current_token.type == X:
                 self.eat(X)
-                token.value = Coeff({1: token.value.dict_x[0]})
+                token.value = Coeff({Number(1): token.value.dict_x[NUMBERNULL]})
             return Node(token)
         if token.type == X:
             self.eat(X)
             return Node(token)
         self.error()
 
-    # def expo(self):
-    #     node = self.coeff()
-    #     while self.current_token.type == EXPO:
-    #         node = Node(data = self.current_token, left = node, right = self.integer())	
+    def expo(self):
+        node = self.coeff()
+        while self.current_token.type == POWER:
+            token = self.current_token
+            self.eat(POWER)
+            node = Node(data = token, left = node, right = self.expo())	
+
+        return node
+
     def factor(self):
         
         token = self.current_token
@@ -318,7 +319,7 @@ class Parser(object):
             self.eat(RPAR)
             return node
 
-        return self.coeff()
+        return self.expo()
 
     def term(self):
         
@@ -347,7 +348,11 @@ class Parser(object):
         return node
 
     def parse(self):
-        return self.expr()
+        ret = self.expr()
+        if self.current_token.type != EOF:
+            self.error(f"Unexpected token '{self.current_token.value}'")
+        
+        return ret
 
 
 class Interpreter(object):
@@ -371,7 +376,9 @@ class Interpreter(object):
             root.data.value = root.left.data.value * root.right.data.value
         elif root.data.type == DIV:
             root.data.value = root.left.data.value / root.right.data.value
-
+        elif root.data.type == POWER:
+            root.data.value = root.left.data.value ** root.right.data.value
+            
 
     def interpret(self):
         self.tree = self.parser.parse()
@@ -388,12 +395,15 @@ def main():
             break
         if not text:
             continue
+        # try:
         lexer = Lexer(text)
         parser = Parser(lexer)
         interpreter = Interpreter(parser)
         result = interpreter.interpret()
-        print_btree(interpreter.tree)
         print(result)
+        print_btree(interpreter.tree)
+        # except Exception as e:
+        #     print(e)
 
 
 
