@@ -2,6 +2,8 @@ from srcs.utils import *
 from srcs.Number import *
 from srcs.BTree import *
 
+import sys
+
 NUMBERNULL = Number(0) # constant null
 class Coeff(object):
     
@@ -9,12 +11,12 @@ class Coeff(object):
         if not isinstance(dict_x, dict):
             raise Exception("Coeff error init")
         
-        try:
-            for i, j in dict_x.items():
-                if j == 0:
-                    dict_x.pop(i)
-        except RuntimeError:
-            dict_x = {NUMBERNULL : NUMBERNULL}
+        # try:
+        #     for i, j in dict_x.items():
+        #         if j == 0:
+        #             dict_x.pop(i)
+        # except RuntimeError:
+        #     dict_x = {NUMBERNULL : NUMBERNULL}
         
         self.dict_x = dict_x
 
@@ -229,14 +231,24 @@ class Parser(object):
 
     def coeff(self):
         
+        sign = 1
+
+        if self.current_token.type in (PLUS, MINUS):
+            if self.current_token.type == MINUS:
+                self.eat(MINUS)
+                sign = -1
+            elif self.current_token.type == PLUS:
+                self.eat(PLUS)
+
         token = self.current_token
         if token.type == INTEGER:
             self.eat(INTEGER)
+            token.value.dict_x[NUMBERNULL] *= Number(sign)
             if self.current_token.type == X:
                 self.eat(X)
                 token.value = Coeff({Number(1): token.value.dict_x[NUMBERNULL]})
             return Node(token)
-        if token.type == X:
+        elif token.type == X:
             self.eat(X)
             return Node(token)
         self.error(f"Unexpected token '{token.type}'")
@@ -327,31 +339,53 @@ class Interpreter(object):
         return self.tree.data.value
 
 
-
-def main():
-    while True:
-        try:
-            text = input('calc> ')
-        except EOFError:
-            break
-        if not text:
-            continue
-        if text == "print":
-            if 'interpreter' in locals() and not interpreter.tree is None:
-                print_btree(interpreter.tree)
-            else:
-                print("Sorry, sorry there are no trees to display")
-        else:
-            try:
-                lexer = Lexer(text)
-                parser = Parser(lexer)
-                interpreter = Interpreter(parser)
-                result = interpreter.interpret()
-                print(result)
-            except Exception as e:
+def launch(text):
+    try:
+        with timeout(10):
+            i = 0
+            lexer = Lexer(text)
+            parser = Parser(lexer)
+            interpreter = Interpreter(parser)
+            result = interpreter.interpret()
+            print(result)
+            i = 1
+            return interpreter.tree
+        if i == 0:
+            print("Error : timeout")
+    except Exception as e:
                 print(e)
+
+
+def main(text = None):
+    
+    if not text is None:
+        launch(text)
+    else:
+
+        while True:
+            try:
+                text = input('Computor > ')
+            except EOFError:
+                break
+            if not text:
+                continue
+            if text == "print":
+                if 'tree' in locals() and not tree is None:
+                    print_btree(tree)
+                else:
+                    print("Sorry, sorry there are no trees to display")
+            elif text in ("exit", "quit"):
+                print ("Goodbye !")
+                break
+            
+            else:
+                tree = launch(text)
 
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) == 1:
+        main()
+    if len(sys.argv) == 2:
+        print("Computor >", sys.argv[1], "\n\n\n")
+        main(sys.argv[1])

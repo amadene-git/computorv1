@@ -2,7 +2,7 @@ expr    : term ((PLUS | MINUS) term)*
 term    : expo ((MUL | DIV) expo)*
 expo	: factor ((POWER) factor)*
 factor  : LPAR expr RPAR | coeff 
-coeff	: (INTEGER (X)) | X
+coeff	:  ((PLUS | MINUS) INTEGER (X)) | X
  
 INTEGER = DIGIT (DIGIT)*
 DIGIT   = '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
@@ -17,7 +17,7 @@ POWER	= '^'
 
 
 v1
-# gerer les unary operator
+# gerer les unary operator devant x
 # ameliorer le parsing integer
 	- gerer les float
 # optimiser Number
@@ -28,4 +28,5 @@ v1
 v2
 # ameliorer les puissances
 	- gerer `NUmber ** Number` -> Number.__pow__(Number, Number)
+
 

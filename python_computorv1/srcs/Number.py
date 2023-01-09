@@ -1,5 +1,8 @@
 class Number(object):
     def __init__(self, num = 0, denom = 1): # ne gere pas les float
+        if denom == 0:
+            raise Exception(f"Number.__init__ error: divide by zero'")
+            
         self.num = num
         self.denom = denom
         
