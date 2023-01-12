@@ -19,13 +19,13 @@ POWER	= '^'
 EQUAL	= '='
 
 v1
-# gerer les unary operator devant x
+
+# gerer (a - b)^2
+
 # ameliorer le parsing integer
 	- gerer les float
 # optimiser Number
 	- gerer les float
-# optimiser Coeff
-	- supprimmer les coeffs nulles
 
 v2
 # ameliorer les puissances

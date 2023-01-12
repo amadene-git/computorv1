@@ -107,6 +107,17 @@ class Coeff(object):
         or NUMBERNULL not in rhs.dict_x.keys():
             raise Exception("Coeff.__pow__ error: cannot solve a^x ... yet")
 
+        # on gere (a+b)² = a² + 2ab + b² -> a etendre au cas G avec le triangle de pascal
+        if len(self.dict_x) == 2\
+        and NUMBERNULL in rhs.dict_x.keys()\
+        and rhs.dict_x[NUMBERNULL] == Number(2):
+            
+            a = Coeff({list(self.dict_x.keys())[0] : list(self.dict_x.values())[0]}) 
+            b = Coeff({list(self.dict_x.keys())[1] : list(self.dict_x.values())[1]}) 
+            two = Coeff({Number(0) : Number(2)})
+            return (a ** two) + (two * a * b) + b ** two
+
+
         # on verifie qu'il n'y a qu'un coeff dans self
         if len(self.dict_x) != 1:
             raise Exception("Coeff.__pow__ error: cannot solve (a + bx + cx^2 +...)^n ... yet")
@@ -351,6 +362,27 @@ class Interpreter(object):
         return self.tree
 
 
+def my_sqrt(b):
+    if b.num == Number(1) and b.denom == Number(1):
+        return b
+    a = Number(1)
+    e = Number(1)
+    while len(str(e.denom)) - len(str(e.num)) < 20:
+        # print("lol")
+        fa = b / a
+        fa += a
+        fa /= Number(2)
+        if fa > a:
+            e = fa - a
+        else:
+            e = a - fa
+        a = fa
+        # print(a)
+    
+    return a
+
+
+
 def print_result(root):
     
     
@@ -369,8 +401,20 @@ def print_result(root):
     # cas d'une equation
     else:
         # print("Equation :")
+        
+        # equation de la forme a = b
+        if n == Number(0)\
+        and len(root.data.value.dict_x.keys()) == 1:
+            print(f"Reduced form: {root.data.value} = 0")
+            print(f"Polynomial degree: {n}")
+            if root.data.value.dict_x[NUMBERNULL] != NUMBERNULL:
+                print(f"There are no solutions in this equation, the calcul will be always false")
+            else:
+                print("Each real number is a solution, the calcul will be always true") 
+       
+       
         # equation de la forme ax + b
-        if n == Number(1)\
+        elif n == Number(1)\
         and len(root.data.value.dict_x.keys()) == 2\
         and Number(0) in root.data.value.dict_x.keys():
             print(f"Reduced form: {root.data.value.dict_x[Number(1)]}x = {root.data.value.dict_x[NUMBERNULL] * Number(-1)}")
@@ -380,7 +424,8 @@ def print_result(root):
             
             if solution.denom != 1:
                 print(f" ≈ {solution.num / solution.denom}")
-        else:
+        # equation premier degre invalid, ou avec des x ^ (< 1)
+        elif n == Number(1):
             # print(list(root.data.value.dict_x)[0])
             if list(root.data.value.dict_x)[0] == NUMBERNULL:
                 # print(f"Value root: {root.data.value}")
@@ -390,16 +435,79 @@ def print_result(root):
             
                 print(f"Reduced form: {root.data.value} = 0")
                 print("The solution is zero")
+        
+        elif n == Number(2)\
+        and len(root.data.value.dict_x.keys()) <= 3:
+            
+
+            # on check si il n'y a pas des degres different de 0, 1 ou 2
+            for i in root.data.value.dict_x.keys():
+                if not i in (Number(0), Number(1), Number(2)):
+                    print("second degre other case: ")
+                    print(f"real Reduced form: {root.left.data.value} = {root.right.data.value}")
+                    print(f"Reduced form: {root.data.value} = 0")
+                    print(f"Polynomial degree: {n}")
+            
+            # on rempli les degres manquant avec 0
+            delta_dict = {}
+            if Number(0) in root.data.value.dict_x.keys():
+                delta_dict[0] = root.data.value.dict_x[Number(0)]
+            else:
+                delta_dict[0] = NUMBERNULL
+
+            if Number(1) in root.data.value.dict_x.keys():
+                delta_dict[1] = root.data.value.dict_x[Number(1)]
+            else:
+                delta_dict[1] = NUMBERNULL
+
+            if Number(2) in root.data.value.dict_x.keys():
+                delta_dict[2] = root.data.value.dict_x[Number(2)]
+            else:
+                delta_dict[2] = NUMBERNULL
+            
+            delta = delta_dict[1] ** Number(2) - Number(4) * delta_dict[2] * delta_dict[0]
 
 
-
+            print(f"Reduced form: {root.data.value} = 0")
             print(f"Polynomial degree: {n}")
+            print(f"Delta = {delta}")
+            
+            if delta.num < 0:
+                print(f"There are no solutions in this equation in the reals set")
+            if delta == 0:
+                solution = delta_dict[1] * Number(-1)
+                solution /= delta_dict[2] * Number(2)
+                print(f"The solution is : {solution}")
+            if delta.num > 0:
+                
+                with timeout(2):
+                    i = 0
+                    x1 = Number(-1) * delta_dict[1] - my_sqrt(delta)
+                    x1 /= Number(2) * delta_dict[2]    
+
+                    x2 = Number(-1) * delta_dict[1] + my_sqrt(delta)
+                    x2 /= Number(2) * delta_dict[2]
+
+                    print(f"The 2 solutions are : x1 = {x1} ; x2 = {x2}")
+                    print(f"The 2 solutions are : x1 = {x1.num / x1.denom} ; x2 = {x2.num / x2.denom}")
+
+                    i = 1
+                if i == 0:
+                    print(f"The 2 solutions are : x1 = {Number(-1) *  delta_dict[1]} -  √{delta} / {Number(2) * delta_dict[2]}")
+                    print(f"                      x2 = {Number(-1) *  delta_dict[1]} +  √{delta} / {Number(2) * delta_dict[2]}")
+
+        else:
+            print("other case: ")
+            print(f"real Reduced form: {root.left.data.value} = {root.right.data.value}")
+            
+            print(f"Reduced form: {root.data.value} = 0")
+            print(f"Polynomial degree: ?")
 
 
 
 def launch(text):
     # try:
-    #     with timeout(10):
+        with timeout(20):
             i = 0
             lexer = Lexer(text)
             parser = Parser(lexer)
@@ -408,8 +516,8 @@ def launch(text):
             print_result(result)
             i = 1
             return interpreter.tree
-    #     if i == 0:
-    #         print("Error : timeout")
+        if i == 0:
+            print("Error : timeout")
     # except Exception as e:
     #             print(e)
     
@@ -462,4 +570,6 @@ if __name__ == '__main__':
         print("Computor >", sys.argv[1], "\n\n\n")
         main(sys.argv[1])
     else:
-        print("Bad number of args")
+        a = my_sqrt(Number(123))
+        print(a)
+        print(a.num / a.denom)

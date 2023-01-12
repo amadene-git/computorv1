@@ -57,19 +57,43 @@ class GenExpr(object):
                 self.text += " - "
             self.term()
             i = randint(0, 2)
-     
+    
+
 
     def generate(self, deep = 10):
         self.count = 0
         self.deep = deep
         self.expr()
+        self.text += " = "
+        self.expr()
+
+        return self.text
+
+
+    def dumbgen(self):
+        self.text += str(randint(-100000, 100000))
+        self.text += "x^2 + "
+        self.text += str(randint(-100000, 100000))
+        self.text += "x + "
+        self.text += str(randint(-100000, 100000))
+        
+        self.text += " = "
+
+        self.text += str(randint(-100000, 100000))
+        self.text += "x^2 + "
+        self.text += str(randint(-100000, 100000))
+        self.text += "x + "
+        self.text += str(randint(-100000, 100000))
+
         return self.text
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print(GenExpr().generate())
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 2 and sys.argv[1] == "dumb":
+        print(GenExpr().dumbgen())
+    elif len(sys.argv) == 2:
         print(GenExpr().generate(deep = int(sys.argv[1])))
 
 

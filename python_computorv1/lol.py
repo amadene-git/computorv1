@@ -1,1 +1,23 @@
-# ( -730  *  x +  871  *  x -  968 )  -  530  /  148  /  509  -  -922  +  -750  -  x /  x /  -288  /  -420  /  79  *  x = ( 247  /  392  +  x /  773  *  210  /  575  +  -318  -  901  +  543  *  478  *  -941 )
+# def my_sqrt(b):
+#     if b == 1.0:
+#         return b
+#     a = 1.0
+#     e = 1.0
+#     while e > 0.0000001:
+#         # print("lol")
+#         fa = b / a
+#         fa += a
+#         fa /= 2.0
+#         if fa > a:
+#             e = fa - a
+#         else:
+#             e = a - fa
+#         a = fa
+#         # print(a)
+    
+#     return a
+
+
+
+
+print(my_sqrt(81.0))
