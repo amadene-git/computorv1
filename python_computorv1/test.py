@@ -12,8 +12,6 @@ class GenExpr(object):
         
         if randint(0,1) == 1:
             self.text += " " + str(randint(-1000, 1000)) + " "
-            if randint(0,1) == 1:
-                self.text += " x "
         else :
             self.text += " x"
             

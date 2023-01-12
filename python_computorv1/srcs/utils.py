@@ -8,6 +8,7 @@ LPAR    = '('
 RPAR    = ')'
 X       = 'X'
 POWER	= 'POWER'
+EQUAL	= 'EQUAL'
 
 
 

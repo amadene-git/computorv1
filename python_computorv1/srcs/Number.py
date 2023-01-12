@@ -36,6 +36,9 @@ class Number(object):
     def __ne__(self, rhs):
         return not self == rhs
 
+    def __gt__(self, rhs):
+        return self.num * rhs.denom > rhs.num * self.denom
+
     def __hash__(self):
         return self.__str__().__hash__()
 	

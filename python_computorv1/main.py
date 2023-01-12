@@ -11,30 +11,29 @@ class Coeff(object):
         if not isinstance(dict_x, dict):
             raise Exception("Coeff error init")
         
-        # try:
-        #     for i, j in dict_x.items():
-        #         if j == 0:
-        #             dict_x.pop(i)
-        # except RuntimeError:
-        #     dict_x = {NUMBERNULL : NUMBERNULL}
+        self.dict_x = {}
+        for i, j in dict_x.items():
+            if j != 0:
+                self.dict_x[i] = j
         
-        self.dict_x = dict_x
+        if len(self.dict_x) == 0:
+            self.dict_x = {NUMBERNULL : NUMBERNULL}
+        
 
     def __str__(self):
         ret = ""
         for i, j in self.dict_x.items():
-            
             if len(ret) > 2 and j.num < 0:
                 ret = ret[:-2]
                 ret += "+ "
             if i == 0:
                 ret += f"{j} + "
             else:
-                if j == 1:
+                if j == Number(1):
                     ret += "x"
                 else:
                     ret += f"{j}x"
-                if i != 1:
+                if i != Number(1):
                     ret += f"^{i}"
                 ret += " + "
                 
@@ -60,15 +59,17 @@ class Coeff(object):
     def __sub__(self, rhs):
         ret = {}
 
+
         for i in self.dict_x.keys():
             if i in rhs.dict_x.keys():
                 ret[i] = self.dict_x[i] - rhs.dict_x[i]
             else:
                 ret[i] = self.dict_x[i]
+        
         for i in rhs.dict_x.keys():
             if i not in self.dict_x.keys():
                 ret[i] = rhs.dict_x[i] * Number(-1)
-
+        
         return Coeff(ret)
 
     def __mul__(self, rhs):
@@ -89,7 +90,10 @@ class Coeff(object):
         for i, j in self.dict_x.items():
             for k, n in rhs.dict_x.items():
                 if i + k in ret.keys():
-                    ret[i - k] += j / n
+                    if i - k in ret.keys():
+                        ret[i - k] += j / n
+                    else:
+                        ret[i - k] = j / n
                 else:
                     ret[i - k] = j / n
         return Coeff(ret)
@@ -203,6 +207,10 @@ class Lexer(object):
             if self.current_char == '^':
                 self.advance()
                 return Token(POWER, '^')
+
+            if self.current_char == '=':
+                self.advance()
+                return Token(EQUAL, '=')
         
             self.error(f"Bad character {self.current_char}")
         
@@ -244,12 +252,10 @@ class Parser(object):
         if token.type == INTEGER:
             self.eat(INTEGER)
             token.value.dict_x[NUMBERNULL] *= Number(sign)
-            if self.current_token.type == X:
-                self.eat(X)
-                token.value = Coeff({Number(1): token.value.dict_x[NUMBERNULL]})
             return Node(token)
         elif token.type == X:
             self.eat(X)
+            token.value.dict_x[Number(1)] *= Number(sign)
             return Node(token)
         self.error(f"Unexpected token '{token.type}'")
         
@@ -301,8 +307,13 @@ class Parser(object):
 
         return node
 
+
+
     def parse(self):
         ret = self.expr()
+        if self.current_token.type == EQUAL:
+            self.eat(EQUAL)
+            ret = Node(data = Token(EQUAL, EQUAL), left=ret, right=self.expr())        
         if self.current_token.type != EOF:
             self.error(f"Unexpected token '{self.current_token.value}'")
         return ret
@@ -331,35 +342,96 @@ class Interpreter(object):
             root.data.value = root.left.data.value / root.right.data.value
         elif root.data.type == POWER:
             root.data.value = root.left.data.value ** root.right.data.value
-            
+        elif root.data.type == EQUAL:
+            root.data.value = root.left.data.value - root.right.data.value
 
     def interpret(self):
         self.tree = self.parser.parse()
         self.calcul(self.tree)
-        return self.tree.data.value
+        return self.tree
+
+
+def print_result(root):
+    
+    
+
+    n = list(root.data.value.dict_x.keys())[0]
+    for i in root.data.value.dict_x.keys():
+        if i > n and i != NUMBERNULL:
+            n = i
+
+    
+    # cas d'une expresssion
+    if root.data.type != EQUAL:
+        # print("Expression :")
+        print(f"Reduced form: {root.data.value}")
+        print(f"Polynomial degree: {n}")
+    # cas d'une equation
+    else:
+        # print("Equation :")
+        # equation de la forme ax + b
+        if n == Number(1)\
+        and len(root.data.value.dict_x.keys()) == 2\
+        and Number(0) in root.data.value.dict_x.keys():
+            print(f"Reduced form: {root.data.value.dict_x[Number(1)]}x = {root.data.value.dict_x[NUMBERNULL] * Number(-1)}")
+            print(f"Polynomial degree: {n}")
+            solution = root.data.value.dict_x[NUMBERNULL] / root.data.value.dict_x[Number(1)] * Number(-1)
+            print(f"The solution is: {solution}")
+            
+            if solution.denom != 1:
+                print(f" ≈ {solution.num / solution.denom}")
+        else:
+            # print(list(root.data.value.dict_x)[0])
+            if list(root.data.value.dict_x)[0] == NUMBERNULL:
+                # print(f"Value root: {root.data.value}")
+                print(f"Reduced form: {root.left.data.value} = {root.right.data.value}")
+                print("Each real number is a solution")
+            else:
+            
+                print(f"Reduced form: {root.data.value} = 0")
+                print("The solution is zero")
+
+
+
+            print(f"Polynomial degree: {n}")
+
 
 
 def launch(text):
-    try:
-        with timeout(10):
+    # try:
+    #     with timeout(10):
             i = 0
             lexer = Lexer(text)
             parser = Parser(lexer)
             interpreter = Interpreter(parser)
             result = interpreter.interpret()
-            print(result)
+            print_result(result)
             i = 1
             return interpreter.tree
-        if i == 0:
-            print("Error : timeout")
-    except Exception as e:
-                print(e)
+    #     if i == 0:
+    #         print("Error : timeout")
+    # except Exception as e:
+    #             print(e)
+    
+
+def preparse(text):
+    i = 0
+    n = len(text)
+
+    while i < n:
+        if text[i] in ('x', 'X'):
+            if i != 0 and text[i - 1].isdigit():
+                text = text[:i] + " * x" + text[i+1:]
+        n = len(text)
+        i += 1
+    return text
+
 
 
 def main(text = None):
     
     if not text is None:
-        launch(text)
+        launch(preparse(text))
     else:
 
         while True:
@@ -379,13 +451,15 @@ def main(text = None):
                 break
             
             else:
-                tree = launch(text)
+                tree = launch(preparse(text))
 
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         main()
-    if len(sys.argv) == 2:
+    elif len(sys.argv) == 2:
         print("Computor >", sys.argv[1], "\n\n\n")
         main(sys.argv[1])
+    else:
+        print("Bad number of args")
