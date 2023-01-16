@@ -1,23 +1,20 @@
-# def my_sqrt(b):
-#     if b == 1.0:
-#         return b
-#     a = 1.0
-#     e = 1.0
-#     while e > 0.0000001:
-#         # print("lol")
-#         fa = b / a
-#         fa += a
-#         fa /= 2.0
-#         if fa > a:
-#             e = fa - a
-#         else:
-#             e = a - fa
-#         a = fa
-#         # print(a)
-    
-#     return a
+def approx(num, root, n_dec = 10):
+    nat_num = 1
+    while nat_num**root <= num:
+        result = nat_num
+        nat_num += 1
+
+    for d in range(1, n_dec+1):
+        increment = 10**-d
+        count = 1
+        before = result
+
+        while (before + increment*count)**root <= num:
+            result = before + increment*count
+            count += 1
+    return result
 
 
 
 
-print(my_sqrt(81.0))
+(− 83571739875 − 3 * √865929162323512275105)/247621636

@@ -23,7 +23,7 @@ class Number(object):
     def __eq__(self, rhs):
 
         if isinstance(rhs, int):
-            return self.num == rhs
+            return self.num / self.denom == float(rhs)
         
         if not isinstance(rhs, Number):
             raise Exception(f"Number.__eq__ error: unsupported operand type(s) for ==: 'Number' and '{type(rhs)}'")
@@ -38,6 +38,16 @@ class Number(object):
 
     def __gt__(self, rhs):
         return self.num * rhs.denom > rhs.num * self.denom
+    
+    def __le__(self, rhs):
+        return self.num * rhs.denom <= rhs.num * self.denom
+    
+    def __ge__(self, rhs):
+        return self.num * rhs.denom >= rhs.num * self.denom
+    
+
+    def __lt__(self, rhs):
+        return self.num * rhs.denom < rhs.num * self.denom
 
     def __hash__(self):
         return self.__str__().__hash__()

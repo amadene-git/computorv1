@@ -51,18 +51,9 @@ class BTree(object):
 
         self.dotf += "\n\n}"
         os.system(f"echo '{self.dotf}' > tmp.dot")
+        os.system(f'rm -rf tree.png;')
         os.system(f"dot -Tpng -o tree.png tmp.dot")
-        os.system('rm -rf tmp.dot')
-        os.system(' xdg-open tree.png;\
-                    ps | grep eog > /dev/null ;\
-                    var=$?;\
-                    while [ $var -eq "0" ];\
-                    do\
-                        sleep 1;\
-                        ps | grep eog > /dev/null;\
-                        var=$?;\
-                    done;\
-                    rm -rf tree.png')
-
+        os.system(f'rm -rf tmp.dot')
+        os.system(f'xdg-open tree.png;')
 def print_btree(root):
     BTree(root).print_btree()

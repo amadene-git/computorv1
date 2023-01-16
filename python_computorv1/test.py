@@ -70,7 +70,7 @@ class GenExpr(object):
         return self.text
 
 
-    def dumbgen(self):
+    def simplegen2(self):
         self.text += str(randint(-100000, 100000))
         self.text += "x^2 + "
         self.text += str(randint(-100000, 100000))
@@ -87,12 +87,28 @@ class GenExpr(object):
 
         return self.text
 
+    def simplegen1(self):
+        self.text += str(randint(-100000, 100000))
+        self.text += "x + "
+        self.text += str(randint(-100000, 100000))
+        
+        self.text += " = "
+
+        self.text += str(randint(-100000, 100000))
+        self.text += "x + "
+        self.text += str(randint(-100000, 100000))
+
+        return self.text
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print(GenExpr().generate())
-    if len(sys.argv) == 2 and sys.argv[1] == "dumb":
-        print(GenExpr().dumbgen())
+    if len(sys.argv) == 2 and sys.argv[1] == "simplegen2":
+        print(GenExpr().simplegen2())
+    elif len(sys.argv) == 2 and sys.argv[1] == "simplegen1":
+        print(GenExpr().simplegen1())
     elif len(sys.argv) == 2:
         print(GenExpr().generate(deep = int(sys.argv[1])))
 

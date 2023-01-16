@@ -20,7 +20,9 @@ EQUAL	= '='
 
 v1
 
-# gerer (a - b)^2
+# ameliorer my_sqrt
+
+# gerer le value_error avec le '²' 
 
 # ameliorer le parsing integer
 	- gerer les float

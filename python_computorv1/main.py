@@ -22,19 +22,24 @@ class Coeff(object):
 
     def __str__(self):
         ret = ""
-        for i, j in self.dict_x.items():
-            if len(ret) > 2 and j.num < 0:
+
+        for i in sorted(self.dict_x):
+            sign = 1
+            if len(ret) > 2 and self.dict_x[i].num < 0:
                 ret = ret[:-2]
-                ret += "+ "
+                ret += "- "
+                sign = -1
             if i == 0:
-                ret += f"{j} + "
+                ret += f"{self.dict_x[i] * Number(sign)} + "
             else:
-                if j == Number(1):
+                if self.dict_x[i] == 1:
                     ret += "x"
+                elif self.dict_x[i] == -1:
+                    ret += "-x"
                 else:
-                    ret += f"{j}x"
-                if i != Number(1):
-                    ret += f"^{i}"
+                    ret += f"{self.dict_x[i] * Number(sign)}x"
+                if i != 1:
+                    ret += f"^{i * Number(sign)}"
                 ret += " + "
                 
         return ret[:-3]
@@ -326,7 +331,7 @@ class Parser(object):
             self.eat(EQUAL)
             ret = Node(data = Token(EQUAL, EQUAL), left=ret, right=self.expr())        
         if self.current_token.type != EOF:
-            self.error(f"Unexpected token '{self.current_token.value}'")
+            self.error(f"Unexpected token '{self.current_token.type}'")
         return ret
 
 
@@ -362,106 +367,188 @@ class Interpreter(object):
         return self.tree
 
 
-def my_sqrt(b):
-    if b.num == Number(1) and b.denom == Number(1):
-        return b
-    a = Number(1)
-    e = Number(1)
-    while len(str(e.denom)) - len(str(e.num)) < 20:
-        # print("lol")
-        fa = b / a
-        fa += a
-        fa /= Number(2)
-        if fa > a:
-            e = fa - a
-        else:
-            e = a - fa
-        a = fa
-        # print(a)
+# def my_sqrt(b):
+#     if b.num == Number(1) and b.denom == Number(1):
+#         return b
+#     a = Number(1)
+#     e = Number(1)
+#     while e.num / e.denom > 0.0001:
+#         print(e.denom / e.num)
+#         fa = b / a
+#         fa += a
+#         fa /= Number(2)
+#         if fa > a:
+#             e = fa - a
+#         else:
+#             e = a - fa
+#         a = fa
     
-    return a
+#     return a
 
+def my_sqrt(num, root = Number(2), n_dec = 20):
+    nat_num = Number(1)
+    while nat_num**root <= num:
+        result = nat_num
+        nat_num += Number(1)
+
+    for d in range(1, n_dec+1):
+        increment = Number(10)**Number(-d)
+        count = Number(1)
+        before = result
+
+        while (before + increment*count)**root <= num:
+            result = before + increment*count
+            count += Number(1)
+    return result
 
 
 def print_result(root):
     
     
 
-    n = list(root.data.value.dict_x.keys())[0]
-    for i in root.data.value.dict_x.keys():
-        if i > n and i != NUMBERNULL:
-            n = i
+    result = root.data.value.dict_x
+
+    degree = list(result.keys())[0]
+    for i in result.keys():
+        if i.denom != 1 or i.num < 0:
+            degree = None
+            break
+        if i > degree and i != NUMBERNULL:
+            degree = i
+
+
 
     
     # cas d'une expresssion
     if root.data.type != EQUAL:
         # print("Expression :")
-        print(f"Reduced form: {root.data.value}")
-        print(f"Polynomial degree: {n}")
+        if degree == 0:
+            print(f"\nresult: {root.data.value}")
+            if result[NUMBERNULL].denom != 1:
+                print(f"      ≈ {result[NUMBERNULL].num / result[NUMBERNULL].denom}")
+        else:
+            print(f"\nReduced form: {root.data.value}")
+            print(f"Polynomial degree: {degree}")
+    
+    
     # cas d'une equation
     else:
         # print("Equation :")
+        print()
+        # equation non polynomiale 
+        if degree is None or degree > Number(2):
+            print(f"Reduced form: {root.left.data.value} = {root.right.data.value}")
+            print(f"              {root.data.value} = 0\n")
+            print(f"Polynomial degree: {degree}\n")
+            
+            print(f"Cannot solve this equation, sorry...")
         
         # equation de la forme a = b
-        if n == Number(0)\
-        and len(root.data.value.dict_x.keys()) == 1:
-            print(f"Reduced form: {root.data.value} = 0")
-            print(f"Polynomial degree: {n}")
-            if root.data.value.dict_x[NUMBERNULL] != NUMBERNULL:
-                print(f"There are no solutions in this equation, the calcul will be always false")
+        elif degree == 0:
+
+            print(f"Reduced form: {root.right.data.value} = {root.left.data.value}")
+            print(f"              {root.right.data.value} - ({root.left.data.value}) = 0")
+
+            
+            # if root.data.value.dict_x[NUMBERNULL] != 0:
+            print(f"              {root.data.value} = 0")
+            print(f"\nPolynomial degree: {degree}\n")
+            
+            
+            # ax^n = bx^n avec n != 0
+            if not NUMBERNULL in root.left.data.value.dict_x.keys():
+                print("The expression is always true, x can be all reals") 
+            elif result[NUMBERNULL] != NUMBERNULL:
+                print(f"The expression is false")
             else:
-                print("Each real number is a solution, the calcul will be always true") 
+                print("The expression is true")
+
        
        
         # equation de la forme ax + b
-        elif n == Number(1)\
-        and len(root.data.value.dict_x.keys()) == 2\
-        and Number(0) in root.data.value.dict_x.keys():
-            print(f"Reduced form: {root.data.value.dict_x[Number(1)]}x = {root.data.value.dict_x[NUMBERNULL] * Number(-1)}")
-            print(f"Polynomial degree: {n}")
-            solution = root.data.value.dict_x[NUMBERNULL] / root.data.value.dict_x[Number(1)] * Number(-1)
+        elif degree == 1\
+        and len(result.keys()) == 2:
+            
+            
+
+            # on ramene tous les x a gauche de l'equation et les autre a droite
+            print(f"Reduced form: {root.left.data.value} = {root.right.data.value}")
+            
+            if Number(1) in root.right.data.value.dict_x.keys():
+                if NUMBERNULL in root.right.data.value.dict_x.keys():                
+                    print(f"              {root.left.data.value} - ({root.right.data.value.dict_x[Number(1)]}x) = {root.right.data.value.dict_x[NUMBERNULL]}")
+                
+                if NUMBERNULL in root.right.data.value.dict_x.keys()\
+                and NUMBERNULL in root.left.data.value.dict_x.keys()\
+                and Number(1) in root.right.data.value.dict_x.keys()\
+                and Number(1) in root.left.data.value.dict_x.keys():
+                    print(f"              {root.left.data.value.dict_x[Number(1)]}x - ({root.right.data.value.dict_x[Number(1)]}x) = {root.right.data.value.dict_x[NUMBERNULL]} - ({root.left.data.value.dict_x[NUMBERNULL]})")
+                print(f"              {result[Number(1)]}x = {result[NUMBERNULL] * Number(-1)}")
+            
+
+
+            print(f"              x = {result[NUMBERNULL] * Number(-1)} / {result[Number(1)]}")
+
+            print()
+            
+            print(f"Polynomial degree: {degree}\n")
+            
+            
+            solution = result[NUMBERNULL] / result[Number(1)] * Number(-1)
+            
             print(f"The solution is: {solution}")
             
             if solution.denom != 1:
                 print(f" ≈ {solution.num / solution.denom}")
-        # equation premier degre invalid, ou avec des x ^ (< 1)
-        elif n == Number(1):
-            # print(list(root.data.value.dict_x)[0])
-            if list(root.data.value.dict_x)[0] == NUMBERNULL:
-                # print(f"Value root: {root.data.value}")
-                print(f"Reduced form: {root.left.data.value} = {root.right.data.value}")
-                print("Each real number is a solution")
-            else:
-            
-                print(f"Reduced form: {root.data.value} = 0")
+        
+        # equation premier degre invalid
+        elif degree == 1:
+            # print(list(result)[0])
+                # print(f"Reduced form: {root.left.data.value} = {root.right.data.value}")
+                
+                if NUMBERNULL in root.right.data.value.dict_x.keys():                
+                    print(f"Reduced form: {root.left.data.value} - ({root.right.data.value.dict_x[Number(1)]}x) = {root.right.data.value.dict_x[NUMBERNULL]}")
+                else:
+                    print(f"Reduced form: {root.left.data.value} - ({root.right.data.value.dict_x[Number(1)]}x) = 0")
+
+                if NUMBERNULL in root.right.data.value.dict_x.keys()\
+                and NUMBERNULL in root.left.data.value.dict_x.keys()\
+                and Number(1) in root.right.data.value.dict_x.keys()\
+                and Number(1) in root.left.data.value.dict_x.keys():
+                    print(f"              {root.left.data.value.dict_x[Number(1)]}x - ({root.right.data.value.dict_x[Number(1)]}x) = {root.right.data.value.dict_x[NUMBERNULL]} - ({root.left.data.value.dict_x[NUMBERNULL]})")
+                print(f"              {root.data.value} = 0\n")
+                
+                
+                print(f"Polynomial degree: {degree}\n")
                 print("The solution is zero")
         
-        elif n == Number(2)\
-        and len(root.data.value.dict_x.keys()) <= 3:
+
+        #eqution second degre
+        elif degree == 2:
             
 
             # on check si il n'y a pas des degres different de 0, 1 ou 2
-            for i in root.data.value.dict_x.keys():
+            for i in result.keys():
                 if not i in (Number(0), Number(1), Number(2)):
                     print("second degre other case: ")
                     print(f"real Reduced form: {root.left.data.value} = {root.right.data.value}")
                     print(f"Reduced form: {root.data.value} = 0")
-                    print(f"Polynomial degree: {n}")
+                    print(f"Polynomial degree: {degree}")
             
             # on rempli les degres manquant avec 0
             delta_dict = {}
-            if Number(0) in root.data.value.dict_x.keys():
-                delta_dict[0] = root.data.value.dict_x[Number(0)]
+            if Number(0) in result.keys():
+                delta_dict[0] = result[Number(0)]
             else:
                 delta_dict[0] = NUMBERNULL
 
-            if Number(1) in root.data.value.dict_x.keys():
-                delta_dict[1] = root.data.value.dict_x[Number(1)]
+            if Number(1) in result.keys():
+                delta_dict[1] = result[Number(1)]
             else:
                 delta_dict[1] = NUMBERNULL
 
-            if Number(2) in root.data.value.dict_x.keys():
-                delta_dict[2] = root.data.value.dict_x[Number(2)]
+            if Number(2) in result.keys():
+                delta_dict[2] = result[Number(2)]
             else:
                 delta_dict[2] = NUMBERNULL
             
@@ -469,7 +556,7 @@ def print_result(root):
 
 
             print(f"Reduced form: {root.data.value} = 0")
-            print(f"Polynomial degree: {n}")
+            print(f"Polynomial degree: {degree}")
             print(f"Delta = {delta}")
             
             if delta.num < 0:
@@ -480,8 +567,8 @@ def print_result(root):
                 print(f"The solution is : {solution}")
             if delta.num > 0:
                 
-                with timeout(2):
-                    i = 0
+                # # with timeout(5):
+                #     i = 0
                     x1 = Number(-1) * delta_dict[1] - my_sqrt(delta)
                     x1 /= Number(2) * delta_dict[2]    
 
@@ -489,19 +576,14 @@ def print_result(root):
                     x2 /= Number(2) * delta_dict[2]
 
                     print(f"The 2 solutions are : x1 = {x1} ; x2 = {x2}")
-                    print(f"The 2 solutions are : x1 = {x1.num / x1.denom} ; x2 = {x2.num / x2.denom}")
+                    if x1.denom != 1 or x2.denom != 1:
+                        print(f"The 2 solutions are : x1 = {x1.num / x1.denom} ; x2 = {x2.num / x2.denom}")
 
-                    i = 1
-                if i == 0:
-                    print(f"The 2 solutions are : x1 = {Number(-1) *  delta_dict[1]} -  √{delta} / {Number(2) * delta_dict[2]}")
-                    print(f"                      x2 = {Number(-1) *  delta_dict[1]} +  √{delta} / {Number(2) * delta_dict[2]}")
+                # #     i = 1
+                # # if i == 0:
+                #     print(f"The 2 solutions are : x1 = ({Number(-1) *  delta_dict[1]} -  √({delta})) / ({Number(2) * delta_dict[2]})")
+                #     print(f"                      x2 = ({Number(-1) *  delta_dict[1]} +  √({delta})) / ({Number(2) * delta_dict[2]})")
 
-        else:
-            print("other case: ")
-            print(f"real Reduced form: {root.left.data.value} = {root.right.data.value}")
-            
-            print(f"Reduced form: {root.data.value} = 0")
-            print(f"Polynomial degree: ?")
 
 
 
@@ -541,25 +623,27 @@ def main(text = None):
     if not text is None:
         launch(preparse(text))
     else:
-
         while True:
             try:
                 text = input('Computor > ')
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 break
-            if not text:
+            if not text or text.isspace():
                 continue
             if text == "print":
                 if 'tree' in locals() and not tree is None:
                     print_btree(tree)
                 else:
-                    print("Sorry, sorry there are no trees to display")
+                    print("Sorry, there are no trees to display")
             elif text in ("exit", "quit"):
-                print ("Goodbye !")
                 break
             
             else:
                 tree = launch(preparse(text))
+
+                print("_________________________________________\n")
+        print("\nGoodbye !")
+        os.system(f'rm -rf tree.png;')
 
 
 
