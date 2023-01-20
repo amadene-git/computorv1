@@ -39,7 +39,7 @@ class Coeff(object):
                 else:
                     ret += f"{self.dict_x[i] * Number(sign)}x"
                 if i != 1:
-                    ret += f"^{i * Number(sign)}"
+                    ret += f"^{i}"
                 ret += " + "
                 
         return ret[:-3]
