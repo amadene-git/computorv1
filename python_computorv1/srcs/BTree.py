@@ -1,4 +1,5 @@
 import os
+from srcs.utils import *
 
 
 
@@ -23,6 +24,7 @@ class BTree(object):
         self.begin = begin
         self.ncount = 0
         self.dotf = ''
+        self.expr = ''
 
     def gendot(self, root = None, id = 0):
 
@@ -54,6 +56,32 @@ class BTree(object):
         os.system(f'rm -rf tree.png;')
         os.system(f"dot -Tpng -o tree.png tmp.dot")
         os.system(f'rm -rf tmp.dot')
-        os.system(f'xdg-open tree.png;')
+        os.system(f'xdg-open tree.png 2> /dev/null')
+
+
+    def print_expr(self, root = None):
+        if root is None:
+            root = self.begin
+        
+        if root.data.type != INTEGER and not isinstance(root.data.value, str):
+            self.expr += f"{root.data.value} "
+            return
+
+        if not root.left is None:
+            self.print_expr(root.left)
+        
+        self.expr += f"{root.data.value} "
+        
+        if not root.right is None:
+            self.print_expr(root.right)
+
+
+
 def print_btree(root):
     BTree(root).print_btree()
+
+
+def str_expr(root):
+    tree = BTree(root)
+    tree.print_expr()
+    return tree.expr

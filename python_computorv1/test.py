@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 from main import *
 from random import randint
 
