@@ -23,7 +23,7 @@ class Number(object):
     def __eq__(self, rhs):
 
         if isinstance(rhs, int):
-            return self.num / self.denom == float(rhs)
+            return self.num == float(rhs)
         
         if not isinstance(rhs, Number):
             raise Exception(f"Number.__eq__ error: unsupported operand type(s) for ==: 'Number' and '{type(rhs)}'")

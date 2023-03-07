@@ -110,9 +110,7 @@ def print_result(root):
             print(f"\nPolynomial degree: {degree}")
             print(f"\nDelta = {delta}")
             
-            if delta.num < 0:
-                print(f"There are no solutions in this equation in the reals set")
-            elif delta == 0:
+            if delta == 0:
                 solution = delta_dict[1] * Number(-1)
                 solution /= delta_dict[2] * Number(2)
                 print(f"The solution is : {solution}")
@@ -131,18 +129,42 @@ def print_result(root):
                 print("\t"*3 + f"x1 = ({Number(-1) *  delta_dict[1]} -  √({delta})) / ({Number(2) * delta_dict[2]})")
                 print("\t"*3 + f"x2 = ({Number(-1) *  delta_dict[1]} +  √({delta})) / ({Number(2) * delta_dict[2]})\n")
 
-
                 if i == 1:
                     x1 = Number(-1) * delta_dict[1] - sqrt_delta
-                    x1 /= Number(2) * delta_dict[2]    
+                    x1 /= Number(2) * delta_dict[2] 
+                    
                     x2 = Number(-1) * delta_dict[1] + sqrt_delta
                     x2 /= Number(2) * delta_dict[2]
                     print("\t"*3 + f"x1 = ({Number(-1) *  delta_dict[1]} -  {sqrt_delta.num / sqrt_delta.denom}) / ({Number(2) * delta_dict[2]})")
                     print("\t"*3 + f"x2 = ({Number(-1) *  delta_dict[1]} +  {sqrt_delta.num / sqrt_delta.denom}) / ({Number(2) * delta_dict[2]})\n")
- 
-                    if x1.denom != 1 or x2.denom != 1:
-                        print("\t"*3 + f"x1 = {x1.num / x1.denom}")
-                        print("\t"*3 + f"x2 = {x2.num / x2.denom}")
+                    print("\t"*3 + f"x1 = {x1.num / x1.denom}")
+                    print("\t"*3 + f"x2 = {x2.num / x2.denom}")
+            elif delta.num < 0:
+
+                delta = delta * Number(-1)
+                i = 0
+                with timeout(5):    
+                    sqrt_delta = my_sqrt(delta)
+                    i = 1
+                if i == 0:
+                    print(f"\nError : Cannot calulate √{delta}")
+
+                print(f"The 2 solutions are :")
+                print("\t"*3 + f"x1 = ({Number(-1) *  delta_dict[1]} -  i√({delta})) / ({Number(2) * delta_dict[2]})")
+                print("\t"*3 + f"x2 = ({Number(-1) *  delta_dict[1]} +  i√({delta})) / ({Number(2) * delta_dict[2]})\n")
+
+                if i == 1:
+                    x1 = Number(-1) * delta_dict[1] - sqrt_delta
+                    x1 /= Number(2) * delta_dict[2] 
+                    
+                    x2 = Number(-1) * delta_dict[1] + sqrt_delta
+                    x2 /= Number(2) * delta_dict[2]
+                    print("\t"*3 + f"x1 = ({Number(-1) *  delta_dict[1]} -  {sqrt_delta.num / sqrt_delta.denom}i) / ({Number(2) * delta_dict[2]})")
+                    print("\t"*3 + f"x2 = ({Number(-1) *  delta_dict[1]} +  {sqrt_delta.num / sqrt_delta.denom}i) / ({Number(2) * delta_dict[2]})\n")
+                    print("\t"*3 + f"x1 = {x1.num / x1.denom}i")
+                    print("\t"*3 + f"x2 = {x2.num / x2.denom}i")
+    
+
 
 
 def launch(text):
@@ -177,7 +199,7 @@ def main(text = None):
                 break
             if not text or text.isspace():
                 continue
-            if not text.isascii():
+            if not text.isascii() or not text.isprintable():
                 print("Error: invalid character")
                 text = None
                 interpreter = None
